@@ -1,0 +1,43 @@
+{
+    "@{ module }@": {
+        "version": "{% if version_added is defined and version_added != '' -%}@{ version_added | default('') | string }@{% endif %}",
+        "deprecated": "{% if deprecated is defined -%}yes{% endif %}",
+        "removedin": "{% if deprecated is defined -%}@{ deprecated['removed_in'] | default('') | string }@{% endif %}",
+        "alias": "{% if aliases is defined -%}@{ ','.join(aliases) }@{% endif %}",
+        "replacedby": "{% if deprecated is defined -%}@{ deprecated['alternative'] | default('') | replace('\"', '\\\"') | replace('\n','') }@{% endif %}",
+        "namespace": "@{ namespace }@",
+        "categorygroup": "@{ category.primary_category }@" ,
+        "category": "@{ category.sub_category }@",
+        "arguments": {
+{# attributes: name, mandatory, version, choices, default choice, default, type, aliases, documentation #}
+{% if options -%}
+{% for key, values in options|dictsort recursive %}
+    {%- set ignoredArguments = ['free-form', 'free_form'] -%}
+    {%- if key not in ignoredArguments %}
+            "@{ key }@": ["{% if values.required is sameas true %}yes{% elif choice is sameas false %}no{% endif %}","@{ values['version_added'] }@",{% set entry = [] -%}
+                [{%- for choice in values.choices -%}
+                 {%   set _ = entry.append('"' + choice | string | replace('\"','\\\"') + '"') %}
+                 {%- endfor -%}
+                 @{ entry | join(',')}@], "{%- if values['choices'] %}@{ values['default'] }@{% endif %}", "{%-
+                    if not values['choices'] -%}@{ values['default'] | replace('\\','\\\\') | replace('\"','\\\"') }@
+                 {%- endif -%}
+                 ", "@{ values['type'] }@", {% set entry = [] -%}
+                [{%- for alias in values.aliases -%}
+                {%   set _ = entry.append('"' + alias | string | replace('\"','\\\"') + '"') %}
+                {%- endfor -%}
+                @{ entry | join(',')}@], "{%- if custom is sameas true -%}
+                {# description #}
+                {%- for descriptionLine in values.description -%}
+                        @{ descriptionLine | html_ify }@{% if loop.nextitem is defined %}<br/>{% endif -%}
+                {%- endfor -%}
+                {%- endif -%}
+                "]{% if loop.nextitem is defined %},
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+        }
+    }
+}
+

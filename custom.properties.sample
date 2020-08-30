@@ -1,0 +1,9 @@
+# custom configuration settings for user specifc definitions
+
+# enable building complete definition pack, including all galaxy collections defined by user (custom) and OrchidE (internal)
+enable.completePackage=false
+
+# comma separated list of custom/additional defined Ansible Galaxy collections
+galaxy.custom.collections=\
+  example.sample,\
+  exmaple.sample2

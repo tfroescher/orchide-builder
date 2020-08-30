@@ -1,0 +1,28 @@
+{
+    "MOD_@{ title.lower() }@@{ plugin_type }@s": {
+    {%- if category['_modules'] %}
+
+        "general": [
+
+            {%- for module in category['_modules'] | sort %}
+
+            { "name": "@{ module }@", "deprecated": "{% if module_info[module]['doc'].deprecated %}yes{% else %}no{% endif %}" }{% if loop.nextitem is defined %},{% endif %}
+            {% endfor %}
+
+        ]{% if subcategories.items() %},{% endif %}
+    {% endif %}
+    {% for name, info in subcategories.items() | sort -%}
+            "@{ name.lower() }@": [
+
+            {%- for module in info['_modules'] | sort %}
+
+            { "name": "@{ module }@", "deprecated": "{% if module_info[module]['doc'].deprecated %}yes{% else %}no{% endif %}" }{% if loop.nextitem is defined %},{% endif %}
+            {% endfor %}
+
+        ]{% if loop.nextitem is defined %},
+    {% endif %}
+    {% endfor %}
+
+    }
+}
+

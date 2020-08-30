@@ -1,0 +1,6 @@
+{
+  "excludes": [
+    "local_action",
+    "set_fact"
+  ]
+}

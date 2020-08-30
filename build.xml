@@ -1,0 +1,317 @@
+<?xml version="1.0"?>
+<project name="doc-tools"
+         xmlns:if="ant:if" xmlns:unless="ant:unless"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="antlib:org.apache.tools.ant"
+         xsi:schemaLocation="antlib:org.apache.tools.ant antlib:org.apache.tools.ant">
+    <property file="${tooldir}/custom.properties"/>
+    <property file="${tooldir}/build.properties"/>
+    <tstamp>
+        <format property="timestamp" pattern="yyyyMMdd-hhmmss" locale="en"/>
+        <format property="datestamp" pattern="yyyyMMdd" locale="en"/>
+    </tstamp>
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath id="antcontrib">
+            <fileset dir="${lib}">
+                <include name="ant-contrib*.jar"/>
+            </fileset>
+        </classpath>
+    </taskdef>
+    <!-- for -->
+    <taskdef resource="net/sf/antcontrib/antlib.xml">
+            <classpath refid="antcontrib"/>
+    </taskdef>
+    <typedef resource="org/apache/ant/props/antlib.xml">
+        <classpath>
+            <fileset dir="${lib}">
+                <include name="ant-props*.jar"/>
+            </fileset>
+        </classpath>
+    </typedef>
+    <presetdef name="log">
+        <echo taskname="log"/>
+    </presetdef>
+    <propertyhelper>
+        <nested/>
+    </propertyhelper>
+    <target name="clean" description="Clean" unless="${clean.disabled}">
+        <delete dir="${build}" failonerror="false"/>
+    </target>
+    <target name="clean-dist" description="Clean">
+        <delete dir="${dist}" failonerror="false"/>
+    </target>
+    <target name="-config">
+        <property name="galaxy.custom.collections" value=""/>
+        <switch value="${enable.completePackage}">
+            <case value="yes">
+                <property name="galaxy.collection.list" value="${galaxy.collections}"/>
+            </case>
+            <case value="true">
+                <property name="galaxy.collection.list" value="${galaxy.collections}"/>
+            </case>
+            <case value="on">
+                <property name="galaxy.collection.list" value="${galaxy.collections}"/>
+            </case>
+            <default>
+                <property name="galaxy.collection.list" value="${galaxy.custom.collections}"/>
+                <var name="module.definitions" value="${galaxy.custom.collections}"/>
+            </default>
+        </switch>
+        <if>
+            <equals arg1="${galaxy.collection.list}" arg2=""/>
+            <then>
+                <fail><![CDATA[
+     ====   Configuration error   ======
+
+       Either a custom.properties file with at list one collection listed in property galaxy.custom.collections must be given
+       or
+       enable.completePackage must be true
+]]></fail>
+            </then>
+        </if>
+        <property name="custom_modules" value="true"/>
+        <mkdir dir="${json}"/>
+        <mkdir dir="${dist}"/>
+        <if>
+            <equals arg1="${custom_modules}" arg2="true"/>
+            <then>
+                <property name="references" value="${dist}/references/external"/>
+            </then>
+            <else>
+                <property name="references" value="${dist}/references"/>
+            </else>
+        </if>
+        <property name="modules" value="${references}/module-${ansible_version_trimmed}"/>
+    </target>
+    <target name="prepare-collections" description="Download collections from galaxy" depends="-config">
+        <exec dir="." errorproperty="error" executable="ansible" outputproperty="output" resolveexecutable="true">
+            <env key="ANSIBLE_CONFIG" file="ansible.cfg"/>
+            <arg value="--version"/>
+        </exec>
+        <log message="${error}"/>
+        <log message="${output}"/>
+        <for param="collection" list="${galaxy.collection.list}">
+            <sequential>
+                <var name="error" unset="yes"/>
+                <var name="output" unset="yes"/>
+                <log message="Downloading @{collection} ..."/>
+                <exec dir="." errorproperty="error" executable="ansible-galaxy" outputproperty="output"
+                      resolveexecutable="true" taskname="ansible-galaxy" failonerror="no"
+                      logerror="yes" resultproperty="result">
+                    <env key="ANSIBLE_CONFIG" file="ansible.cfg"/>
+                    <arg value="collection"/>
+                    <arg value="install"/>
+                    <arg line="-p ${build}/collections"/>
+                    <arg value="@{collection}"/>
+                </exec>
+                <switch value="${result}">
+                    <case value="0"></case>
+                    <case value="1">
+                        <log message="Result code 1 - collection with name @{collection} not found on galaxy"/>
+                    </case>
+                    <case value="250">
+                        <log message="Result code indicates error: ${result}"/>
+                    </case>
+                    <default>
+                        <log message="Unknown result code indicates error: ${result}"/>
+                    </default>
+                </switch>
+                <if>
+                    <not>
+                        <equals arg1="${error}" arg2=""/>
+                    </not>
+                    <then>
+                        <log message="ansible-galaxy error message: ${error}"/>
+                    </then>
+                </if>
+                <if>
+                    <contains string="${output}" substring="Installing "/>
+                    <then>
+                        <echo message="${output}" file="${build}/logsnippet.txt"/>
+                        <var name="install" unset="yes"/>
+                        <loadfile property="install" srcfile="${build}/logsnippet.txt">
+
+                            <filterchain>
+                                <tailfilter lines="1"/>
+                            </filterchain>
+                        </loadfile>
+                        <log message="  -->  ${install}"/>
+                    </then>
+                    <else>
+                        <if>
+                            <contains string="${output}" substring="as it is already installed"/>
+                            <then>
+                                <log message="   Skipping, @{collection} is already installed"/>
+                            </then>
+                            <else>
+                                <log message="${output}"/>
+                            </else>
+                        </if>
+                    </else>
+                </if>
+                <!-- Result 0: Install, skipping -->
+                <!-- Result 1: error failed to find collection with name -->
+                <!-- Result 250: ? -->
+            </sequential>
+        </for>
+    </target>
+    <target name="prepare-ansible-base" description="Copies Ansible base modules for module definition creation">
+        <exec dir="." errorproperty="error" executable="sh" outputproperty="output"
+              resolveexecutable="true" taskname="shell" failonerror="no"
+              logerror="yes" resultproperty="result" newenvironment="no">
+            <arg line="-c &quot;ansible --version | grep -o -e '/.*site-packages.*'&quot;"/>
+        </exec>
+        <property name="ansible_module_path" value="${output}"/>
+        <log message="Using Ansible module path ${ansible_module_path} ..."/>
+        <mkdir dir="${build}/collections/ansible_collections/ansible/core/plugins"/>
+        <copy todir="${build}/collections/ansible_collections/ansible/core/plugins" preservelastmodified="yes">
+            <fileset dir="${ansible_module_path}">
+                <include name="module*/**"/>
+            </fileset>
+        </copy>
+        <echo file="${build}/collections/ansible_collections/ansible/core/MANIFEST.json"><![CDATA[
+{
+    "collection_info": {
+    "namespace": "ansible",
+    "name": "core",
+    "version": "0.0.1",
+    "dependencies": {}
+    }
+}
+]]>
+        </echo>
+    </target>
+    <target name="create-definitions" description="Create module definitions" depends="-config">
+        <property name="custom_modules" value="true"/>
+        <mkdir dir="${json}"/>
+        <mkdir dir="${dist}"/>
+        <mkdir dir="${modules}/parsers"/>
+        <mkdir dir="${modules}/modules"/>
+        <echo file="${modules}/collections.json"><![CDATA[[]]></echo>
+        <for param="collection" list="${module.definitions}">
+            <sequential>
+                <var name="error" unset="yes"/>
+                <var name="output" unset="yes"/>
+                <log message="Creating json files ..."/>
+                <propertyregex input="@{collection}" property="collection_path" override="yes" regexp="\."
+                               replace="\/"/>
+                <log message="collection path: ${collection_path}."/>
+                <mkdir dir="${modules}/parsers/@{collection}"/>
+                <echo file="${modules}/collections.json" append="yes"><![CDATA[
+    "@{collection}",]]></echo>
+                <mkdir dir="${modules}/modules/@{collection}"/>
+                <trycatch>
+                    <try>
+                        <exec dir="." errorproperty="error" executable="hacking/build-ansible.py"
+                              outputproperty="output" resolveexecutable="true" taskname="build-ansible" logerror="yes"
+                              resultproperty="result">
+                            <env key="PYTHONPATH" value="${build}/collections"/>
+                            <arg value="document-plugins"/>
+                            <arg line="-t json"/>
+                            <arg line="--template-dir ./docs/templates"/>
+                            <arg line="--module-dir ${build}/collections/ansible_collections/${collection_path}/plugins/modules"/>
+                            <arg line="-c ${custom_modules}"/>
+                            <arg line="-o ${json}/@{collection}"/>
+                            <arg value="-v"/>
+                        </exec>
+                    </try>
+                    <finally>
+                        <log message="${output}"/>
+                        <log message="${error}"/>
+                        <log file="${build}/build-ansible-warnings.log" append="yes"><![CDATA[${error}
+]]></log>
+                        <log message="Result ${result}"/>
+                    </finally>
+                </trycatch>
+                <move todir="${modules}/parsers/@{collection}">
+                    <fileset dir="${json}/@{collection}">
+                        <include name="_list_of_all*"/>
+                    </fileset>
+                </move>
+                <move todir="${modules}/modules/@{collection}">
+                    <fileset dir="${json}/@{collection}">
+                        <include name="*.json"/>
+                    </fileset>
+                </move>
+            </sequential>
+        </for>
+        <loadfile srcfile="${modules}/collections.json" property="fixlastline">
+            <filterchain>
+                <tailfilter lines="1"/>
+            </filterchain>
+        </loadfile>
+        <log message="Fixing last line ${fixlastline} json format ..."/>
+        <replaceregexp file="${modules}/collections.json" replace="${fixlastline},,,,,," match=".*(${fixlastline}).*"
+                       byline="yes" flags="gi"/>
+        <replaceregexp file="${modules}/collections.json" replace="" match=",,,,,,," byline="yes" flags="gi"/>
+        <echo file="${modules}/collections.json" append="yes"><![CDATA[
+]
+]]></echo>
+    </target>
+    <target name="create-static" description="Copies static definition files for bundling" depends="-config">
+        <copy todir="${references}">
+            <fileset dir="src/main/resources/static/references"/>
+        </copy>
+    </target>
+    <target name="jar" description="Create final distribution jar with all definitions.">
+        <jar destfile="${dist}/orchide-definitions.jar">
+            <manifest>
+                <attribute name="Build-Date" value="${timestamp}"/>
+                <attribute name="Version" value="${datestamp}"/>
+            </manifest>
+            <fileset dir="${dist}">
+                <include name="references/**"/>
+            </fileset>
+        </jar>
+    </target>
+    <target name="validate-json" description="Validate generated json" depends="-config">
+        <for param="jsonfile">
+            <path>
+                <fileset dir="${references}">
+                    <include name="**/*.json"/>
+                </fileset>
+            </path>
+            <sequential>
+                <var name="toValidateJson" unset="true"/>
+                <loadfile property="toValidateJson" srcfile="@{jsonfile}"/>
+                <var name="jsonvalidate" unset="true"/>
+                <log><![CDATA[Validating json @{jsonfile}.... ]]></log>
+                <script language="javascript" taskname="jsonvalidate">
+                    <![CDATA[
+                    json = project.getProperty("toValidateJson");
+                    isValid = true
+                    try {
+                        JSON.parse(json);
+                    } catch (e) {
+                        isValid = false;
+                    }
+                    project.setProperty("jsonvalidate", isValid);
+                    ]]>
+                </script>
+                <log message="  finished."/>
+                <if>
+                    <equals arg1="${jsonvalidate}" arg2="false"/>
+                    <then>
+                        <log message="ERROR: JSON validation error"/>
+                        <fail><![CDATA[ ERROR: JSON validation error in @{jsonfile}.]]></fail>
+                    </then>
+                </if>
+            </sequential>
+        </for>
+    </target>
+    <target name="patch-freeform" description="Correct json syntax of tasks with free-form keys">
+        <replaceregexp file="${modules}/modules/ansible.core/include_tasks.json" match="\](?!.*\])," replace="\]" byline="no" flags="g"/>
+        <replaceregexp file="${modules}/modules/ansible.core/raw.json" match="\](?!.*\])," replace="\]" byline="no" flags="g"/>
+    </target>
+    <target name="build-all" description="Run all build steps">
+        <runtarget target="-config"/>
+        <runtarget target="clean"/>
+        <runtarget target="prepare-ansible-base"/>
+        <runtarget target="prepare-collections"/>
+        <runtarget target="patch-freeform"/>
+        <runtarget target="create-definitions"/>
+        <runtarget target="create-static"/>
+        <runtarget target="validate-json"/>
+        <runtarget target="jar"/>
+    </target>
+</project>

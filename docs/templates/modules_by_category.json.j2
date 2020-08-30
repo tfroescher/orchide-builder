@@ -1,0 +1,11 @@
+{
+   "categorygroupfiles": [
+      {%- for name in categories %}
+      {%- if name %}
+
+      "@{ name }@"{% if loop.nextitem is defined %},{% endif %}
+      {%- endif %}
+      {%- endfor %}
+
+   ]
+}

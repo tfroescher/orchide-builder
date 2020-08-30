@@ -1,0 +1,43 @@
+{
+   "categorygroup": {
+      {%- for group in category_groups %}
+      {%- if group.title != '' -%}
+      {%- set category = group.category -%}
+      {%- set subcategories = group.subcategories %}
+
+      "@{ group.category_name }@": {
+         "title": "@{ group.title }@",
+         "name": "@{ group.category_name | replace(' ', '_') }@",
+         "modules": {
+             {%- if category['_modules'] %}
+
+             "general": [
+                {%- for module in category['_modules'] | sort %}
+
+                { "name": "@{ module }@", "deprecated": "" }{% if loop.nextitem is defined %},{% endif %}
+                {% endfor %}
+
+             ]{% if subcategories.items() %},{%- endif -%}
+             {% endif %}
+
+             {%- for name, info in subcategories.items() | sort %}
+
+             "@{ name.lower() }@": [
+                 {%- for module in info['_modules'] | sort %}
+
+                 { "name": "@{ module }@", "deprecated": "" }{% if loop.nextitem is defined %},{% endif %}
+                 {% endfor %}
+
+             ]{%- if loop.nextitem is defined %},{% endif %}
+          {% endfor %}
+
+         }
+      }{% if loop.nextitem is defined %},{% endif %}
+      {% endif -%}
+      {% endfor %}
+
+   }
+}
+
+
+
