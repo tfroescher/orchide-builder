@@ -1,13 +1,102 @@
 {
+    {%- set params_htmlify = ['description', 'returned', 'default'] -%}
+    {%- set params_sample = ['sample', 'example', 'full_key'] -%}
+    {%- set params_list = ['choices'] -%}
+
+    {%- macro m_format_value_entry(key, value) -%}
+        {%- if key in params_sample %}"@{ key }@": "@{ m_container2html(value) }@"
+        {%- elif key in params_htmlify and not value is mapping %}"@{ key }@": "@{ value | html_desc }@"
+        {%- elif key in params_list and value is sequence %}"@{ key }@": [{% for choice in value %}"@{ choice | html_ify }@"{% if loop.nextitem is defined %},{% endif %}{% endfor %}]
+        {%- else -%}"@{ key }@": {% if value is string %}"@{ value | default('') | quote_backslash }@"{%- else -%}"@{ m_container2html(value) }@"{%- endif -%}
+        {%- endif -%}
+    {%- endmacro -%}
+
+    {%- macro m_container2html(map) -%}
+        {%-if map is mapping -%}
+            @{ map | tojson | string | quote_backslash | html_ify }@
+        {%- elif map is sequence -%}
+            @{ map | tojson | string | quote_backslash | html_ify }@
+        {%- else -%}
+            @{ map | default('') | string | quote_backslash | html_ify }@
+        {%- endif -%}
+    {%- endmacro -%}
+
+
+    {%- macro m_suboptions(map, start_indent = "") -%}
+            {%- for key, values in map|dictsort recursive %}
+            @{ start_indent }@"@{ key }@": {
+{% if values is mapping -%}
+                {%- for key, value in values|dictsort recursive -%}
+                {%- if key == "suboptions" -%}
+                    {%- set new_indent = start_indent + "        " %}
+                    @{ start_indent[:-4] }@"@{ key }@": {
+@{m_suboptions(value, new_indent)}@
+                {%- else  %}
+                @{ start_indent }@@{ m_format_value_entry(key, value) }@
+                {%- endif -%}
+                {% if loop.nextitem is defined %},
+{% endif %}
+{% endfor %}
+
+{% endif %}
+                @{ start_indent[:-4] }@}{% if loop.nextitem is defined %},
+{% endif %}
+        {%- endfor %}
+
+            @{ start_indent[:-4] }@}
+    {%- endmacro -%}
+
+
+
     "@{ module }@": {
         "version": "{% if version_added is defined and version_added != '' -%}@{ version_added | default('') | string }@{% endif %}",
+        "collection_version": "{% if collection_version is defined and collection_version != '' -%}@{ collection_version | default('') | string }@{% endif %}",
         "deprecated": "{% if deprecated is defined -%}yes{% endif %}",
         "removedin": "{% if deprecated is defined -%}@{ deprecated['removed_in'] | default('') | string }@{% endif %}",
         "alias": "{% if aliases is defined -%}@{ ','.join(aliases) }@{% endif %}",
-        "replacedby": "{% if deprecated is defined -%}@{ deprecated['alternative'] | default('') | replace('\"', '\\\"') | replace('\n','') }@{% endif %}",
+        "replacedby": "{% if deprecated is defined -%}@{ (deprecated['alternative'] | default('') | quote_backslash | html_ify) }@{% endif %}",
         "namespace": "@{ namespace }@",
         "categorygroup": "@{ category.primary_category }@" ,
         "category": "@{ category.sub_category }@",
+        "short_description": "@{ short_description | quote_backslash | html_ify }@",
+        "returndocs": {% if returndocs is mapping %}{
+            {%- set indent = "" %}
+            {%- macro m_returndocs(values, i) -%}
+            {%- set indent = i %}
+{% for key, value in values|dictsort recursive %}
+            {% if key in params_sample %}@{ indent }@"@{ key }@": "@{ m_container2html(value) }@"{% if loop.nextitem is defined %},
+{% endif %}
+            {%- elif key in params_htmlify and not value is mapping %}@{ indent }@"@{ key }@": "@{ value | html_desc }@"{% if loop.nextitem is defined %},
+{% endif %}
+            {%- else -%}@{ indent }@"@{ key }@": {% if value is string %}"@{ value | default('') | quote_backslash }@"
+            {%- elif value is mapping -%}{
+{% set new_indent = indent + "    " -%}
+@{ m_returndocs(value, new_indent) }@
+            @{ indent }@}{%- set indent = indent[:-4] %}{%- else %}"@{value | default('')}@"{%- endif -%}{%- if loop.nextitem is defined %},
+{% endif %}
+{%- endif %}
+{%- endfor %}
+            {%- endmacro %}
+
+@{ m_returndocs(returndocs, "") }@
+        }{% else -%}""{% endif %},
+        "description": "{%- for descriptionLine in description -%}
+            @{ descriptionLine | quote_backslash | html_ify }@{% if loop.nextitem is defined %}{% endif -%}
+        {%- endfor -%}",
+        "docuri": "@{ docuri }@",
+        "plainexamples": "@{ (plainexamples | quote_backslash | html_ify)[:-2] }@",
+        "metadata": "@{ metadata  }@",
+        "notes": "{% if notes %}<ul>{%- for line in notes -%}
+        <li>@{ line | quote_backslash | html_ify }@{% if loop.nextitem is defined %}<br/>{% endif -%}</li>
+{%- endfor -%}</ul>{% endif %}",
+        "requirements": [
+{%- for value in requirements -%}
+            "@{ value | quote_backslash | html_ify }@"{%- if loop.nextitem is defined -%},{%- endif -%}
+{%- endfor %}
+],
+        "authors": "{% if author %}<ul>{%- for line in author -%}
+<li>@{ line | quote_backslash | html_ify }@{% if loop.nextitem is defined %}<br/>{% endif -%}</li>
+{%- endfor -%}</ul>{% endif %}",
         "arguments": {
 {# attributes: name, mandatory, version, choices, default choice, default, type, aliases, documentation #}
 {% if options -%}
@@ -19,7 +108,10 @@
                  {%   set _ = entry.append('"' + choice | string | replace('\"','\\\"') + '"') %}
                  {%- endfor -%}
                  @{ entry | join(',')}@], "{%- if values['choices'] %}@{ values['default'] }@{% endif %}", "{%-
-                    if not values['choices'] -%}@{ values['default'] | replace('\\','\\\\') | replace('\"','\\\"') }@
+                    if not values['choices'] -%}
+                        {%- if values['default'] is mapping -%}@{ values['default'] | tojson | string | quote_backslash | html_ify }@
+                        {%- else  %}@{ values['default'] | replace('\\','\\\\') | replace('\"','\\\"') }@
+                        {%- endif -%}
                  {%- endif -%}
                  ", "@{ values['type'] }@", {% set entry = [] -%}
                 [{%- for alias in values.aliases -%}
@@ -28,10 +120,15 @@
                 @{ entry | join(',')}@], "{%- if custom is sameas true -%}
                 {# description #}
                 {%- for descriptionLine in values.description -%}
-                        @{ descriptionLine | html_ify }@{% if loop.nextitem is defined %}<br/>{% endif -%}
-                {%- endfor -%}
-                {%- endif -%}
-                "]{% if loop.nextitem is defined %},
+                        @{ descriptionLine | quote_backslash | html_ify }@{% if loop.nextitem is defined %}<br/>{% endif -%}
+                {%- endfor -%}",{
+{% if values['suboptions'] is defined -%}
+@{ m_suboptions(values['suboptions'], "    ") }@
+{%- else %}
+            }
+{%- endif -%}
+
+                {%- endif -%}]{% if loop.nextitem is defined %},
 {% endif %}
 {% endif %}
 {% endfor %}

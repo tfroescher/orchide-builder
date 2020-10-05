@@ -48,7 +48,7 @@ from ansible.utils.display import Display
 from ..change_detection import update_file_if_different  # pylint: disable=relative-beyond-top-level
 from ..commands import Command  # pylint: disable=relative-beyond-top-level
 from ..jinja2.filters import do_max, documented_type, html_ify, rst_fmt, rst_ify, \
-    rst_xline  # pylint: disable=relative-beyond-top-level
+    rst_xline, quote_backslash, html_desc, get_type  # pylint: disable=relative-beyond-top-level
 
 #####################################################################################
 # constants and paths
@@ -322,6 +322,10 @@ def jinja2_environment(template_dir, typ, plugin_type):
     if typ == 'json':
         env.filters['rst_ify'] = rst_ify
         env.filters['html_ify'] = html_ify
+        env.filters['quote_backslash'] = quote_backslash
+        env.filters['html_desc'] = html_desc
+        env.filters['type'] = get_type
+        # env.filters['quote_newline'] = quote_newline
         env.filters['fmt'] = rst_fmt
         env.filters['xline'] = rst_xline
         env.filters['documented_type'] = documented_type
@@ -366,7 +370,7 @@ def too_old(added):
     except ValueError as e:
         warnings.warn("Could not parse %s: %s" % (added, str(e)))
         return False
-    return added_float < TOO_OLD_TO_BE_NOTABLE
+    return False # collections might have 1.0.0, added_float < TOO_OLD_TO_BE_NOTABLE
 
 
 def process_options(module, options, full_key=None):
@@ -452,7 +456,7 @@ def process_returndocs(returndocs, full_key=None):
                     process_returndocs(suboptions[0], full_key=full_key_k)
 
 
-def process_plugins(module_map, templates, outputname, output_dir, ansible_version, plugin_type, custom=True):
+def process_plugins(module_map, templates, outputname, output_dir, ansible_version, plugin_type, custom=True, collection_version=""):
     for module_index, module in enumerate(module_map):
 
         show_progress(module_index)
@@ -483,6 +487,7 @@ def process_plugins(module_map, templates, outputname, output_dir, ansible_versi
         doc['categorygroup'] = module_index
         doc['category'] = module_map[module]
         doc['custom'] = custom.lower() in ['true', 'yes', 'on']
+        doc['collection_version'] = collection_version
         if module_map[module]['deprecated'] and 'deprecated' not in doc:
             display.warning("%s PLUGIN MISSING DEPRECATION DOCUMENTATION: %s" % (fname, 'deprecated'))
 
@@ -544,7 +549,7 @@ def process_plugins(module_map, templates, outputname, output_dir, ansible_versi
 
         # use 'examples' for 'plainexamples' if 'examples' is a string
         if isinstance(module_map[module]['examples'], string_types):
-            doc['plainexamples'] = module_map[module]['examples']  # plain text
+            doc['plainexamples'] = module_map[module]['examples'] # plain text
         else:
             doc['plainexamples'] = ''
 
@@ -777,6 +782,7 @@ class DocumentPlugins(Command):
                             help="verbose mode (increase number of 'v's for more)")
 
         parser.add_argument("-c", "--custom-definitions", action='store', dest='custom', default=True, help="Create custom module definitions for OrchidE")
+        parser.add_argument("-r", "--collection-version", action='store', dest='collection_version', default="", help="Collection version")
 
     @staticmethod
     def main(args):
@@ -840,7 +846,7 @@ class DocumentPlugins(Command):
                     if short_desc is None:
                         display.warning('short_description for %s is None' % key)
                         short_desc = ''
-                    record['doc']['short_description'] = rst_ify(short_desc)
+                    record['doc']['short_description'] = short_desc
 
             category_group = get_categories_templatedata(plugin_info, categories, plugin_type)
             category_list_text = templates['category_full_list'].render(category_groups=category_group)
@@ -869,7 +875,7 @@ class DocumentPlugins(Command):
 
         # Render all the individual plugin pages
         display.v('Generating module/plugin pages')
-        process_plugins(plugin_info, templates, outputname, output_dir, args.ansible_version, plugin_type, args.custom)
+        process_plugins(plugin_info, templates, outputname, output_dir, args.ansible_version, plugin_type, args.custom, args.collection_version)
 
 
         return 0
