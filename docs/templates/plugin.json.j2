@@ -128,7 +128,7 @@
             }
 {%- endif -%}
 
-                {%- endif -%}]{% if loop.nextitem is defined %},
+                {%- else -%}"{%- endif -%}]{% if loop.nextitem is defined %},
 {% endif %}
 {% endif %}
 {% endfor %}
