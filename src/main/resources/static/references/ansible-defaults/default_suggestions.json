@@ -38,14 +38,14 @@
     "Slackware",
     "Solaris",
     "Suse",
-    "Win32NT"
+    "Windows"
   ],
   "ansible_system": [
     "AIX",
     "Linux",
     "OpenBSD",
     "SunOS",
-    "Windows"
+    "Win32NT"
   ],
   "ansible_distribution_major_version": [
     "1",
