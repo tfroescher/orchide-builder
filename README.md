@@ -19,7 +19,15 @@ To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
     Either it shows you the path the properties file, which is in the plugins root folder or it opens an existing properties file which is located in the plugin root folder.
 1. Restart IntelliJ
 
-New definition files will now be used. 
+New definition files will now be used.
+
+#### Alternative Method (See https://github.com/tfroescher/orchide-builder/issues/1)
+
+1. Create a directory on your filesystem - p.e. `~/.orchide` and put the downloaded .jar there.
+1. Open IDE settings > Languages & Frameworks > OrchidE > Extension.
+1. Add the path to your newly created directory and hit `Check for update`.
+1. Hit `Apply`.
+1. Check if the collections are updated. If not, restart your IDE.
 
 ## Getting started - create your own definition package
 
