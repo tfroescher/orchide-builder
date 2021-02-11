@@ -83,16 +83,21 @@
         </if>
         <property name="modules" value="${references}/module-${ansible_version_trimmed}"/>
     </target>
-    <target name="prepare-collections" description="Download collections from galaxy" depends="-config">
+    <target name="prepare-collections" description="Download collections from galaxy" depends="-config" unless="${prepare-collections.disabled}">
         <exec dir="." errorproperty="error" executable="ansible" outputproperty="output" resolveexecutable="true">
             <env key="ANSIBLE_CONFIG" file="ansible.cfg"/>
             <arg value="--version"/>
         </exec>
         <var name="version_logfile" value="${build}/build-download-collection-versions.log"/>
-
+        <var name="version_download" value="${build}/build-download-collection-versions.md"/>
+        <var name="version_references_old" value="version_references.properties"/>
+        <var name="version_references_new" value="${build}/version_references.properties"/>
+        <property file="${version_references_old}" prefix="versionref"/>
         <log message="${error}"/>
         <log message="${output}"/>
         <delete file="${version_logfile}" failonerror="no"/>
+        <delete file="${version_download}" failonerror="no"/>
+        <delete file="${version_references_new}" failonerror="no"/>
         <for param="collection" list="${galaxy.collection.list}">
             <sequential>
                 <var name="error" unset="yes"/>
@@ -140,13 +145,12 @@
       [log] Downloading https://galaxy.ansible.com/download/ansible-netcommon-1.3.0.tar.gz to /home/dev/.ansible/tmp/ansible-local-397pw99priw/tmpw7julk6n
       [log] ansible.netcommon (1.3.0) was installed successfully
                 -->
+                <echo message="${output}" file="${build}/logsnippet.txt"/>
                 <if>
                     <contains string="${output}" substring="Installing "/>
                     <then>
-                        <echo message="${output}" file="${build}/logsnippet.txt"/>
                         <var name="install" unset="yes"/>
                         <loadfile property="install" srcfile="${build}/logsnippet.txt">
-
                             <filterchain>
                                 <linecontainsregexp>
                                     <regexp pattern=".*was installed successfully.*"/>
@@ -168,6 +172,18 @@
                                         <log message="${output}"/>
                                     </then>
                                 </if>
+                                <var name="error" unset="yes"/>
+                                <var name="output" unset="yes"/>
+                                <exec dir="." errorproperty="error" executable="ansible-galaxy" outputproperty="output"
+                                      resolveexecutable="true" taskname="ansible-galaxy" failonerror="no"
+                                      logerror="yes" resultproperty="result">
+                                    <env key="ANSIBLE_CONFIG" file="ansible.cfg"/>
+                                    <arg value="collection"/>
+                                    <arg value="list"/>
+                                    <arg value="@{collection}"/>
+                                </exec>
+                                <echo message="Galaxy ${output}"/>
+                                <echo message="${output}" file="${build}/logsnippet.txt"/>
                             </then>
                             <else>
                                 <log message="${output}"/>
@@ -175,13 +191,54 @@
                         </if>
                     </else>
                 </if>
+                <var name="collection-version-line" unset="yes"/>
+                <loadfile property="collection-version-line" srcfile="${build}/logsnippet.txt">
+                    <filterchain>
+                        <linecontainsregexp>
+                            <regexp pattern="Installing .*' to.*"/>
+                        </linecontainsregexp>
+                    </filterchain>
+                </loadfile>
+                <if>
+                    <isset property="collection-version-line"/>
+                    <else>
+                        <loadfile property="collection-version-line" srcfile="${build}/logsnippet.txt">
+                            <filterchain>
+                                <linecontainsregexp>
+                                    <regexp pattern="@{collection} *[0-9].*"/>
+                                </linecontainsregexp>
+                            </filterchain>
+                        </loadfile>
+                    </else>
+                </if>
+                <var name="collection-version" value=""/>
+                <propertyregex input="${collection-version-line}" property="collection-version" regexp="^Installing '(.*)\:(.*)' to.*$" select="\2" global="yes" override="yes"
+                               defaultValue=""/>
+                <propertyregex input="${collection-version-line}" property="collection-version" regexp="^@{collection} *([0-9\.]*) *$" select="\1" global="yes" override="yes"/>
+                <echo message="Got @{collection} ${collection-version}"/>
+                <propertycopy property="version_ref" from="versionref.@{collection}" override="yes" silent="yes"/>
+                <var name="version_update_message" value=""/>
+                <if>
+                    <not>
+                        <equals arg1="${collection-version}" arg2="${version_ref}"/>
+
+                    </not>
+                    <then>
+                        <var name="version_update_message" value=" (updated from ${version_ref})"/>
+                    </then>
+                </if>
+                <log file="${version_download}" append="yes"><![CDATA[- @{collection} ${collection-version}${version_update_message}
+]]></log>
+                <log file="${version_references_new}" append="yes"><![CDATA[@{collection}=${collection-version}
+]]></log>
+
                 <!-- Result 0: Install, skipping -->
                 <!-- Result 1: error failed to find collection with name -->
                 <!-- Result 250: ? -->
             </sequential>
         </for>
     </target>
-    <target name="prepare-ansible-base" description="Copies Ansible base modules for module definition creation">
+    <target name="prepare-ansible-base" description="Copies Ansible builtin modules for module definition creation">
         <exec dir="." errorproperty="error" executable="sh" outputproperty="output"
               resolveexecutable="true" taskname="shell" failonerror="no"
               logerror="yes" resultproperty="result" newenvironment="no">
@@ -189,18 +246,18 @@
         </exec>
         <property name="ansible_module_path" value="${output}"/>
         <log message="Using Ansible module path ${ansible_module_path} ..."/>
-        <mkdir dir="${build}/collections/ansible_collections/ansible/core/plugins"/>
-        <copy todir="${build}/collections/ansible_collections/ansible/core/plugins" preservelastmodified="yes">
+        <mkdir dir="${build}/collections/ansible_collections/ansible/builtin/plugins"/>
+        <copy todir="${build}/collections/ansible_collections/ansible/builtin/plugins" preservelastmodified="yes">
             <fileset dir="${ansible_module_path}">
                 <include name="module*/**"/>
             </fileset>
         </copy>
-        <echo file="${build}/collections/ansible_collections/ansible/core/MANIFEST.json"><![CDATA[
+        <echo file="${build}/collections/ansible_collections/ansible/builtin/MANIFEST.json"><![CDATA[
 {
     "collection_info": {
     "namespace": "ansible",
-    "name": "core",
-    "version": "0.0.1",
+    "name": "builtin",
+    "version": "2.10.2",
     "dependencies": {}
     }
 }
@@ -271,6 +328,7 @@
                         <var name="error" unset="yes"/>
                         <var name="output" unset="yes"/>
                         <var name="result" unset="yes"/>
+                        <property name="verbose" value="-v"/>
                         <exec dir="." errorproperty="error" executable="hacking/build-ansible.py"
                               outputproperty="output" resolveexecutable="true" taskname="build-ansible" logerror="yes"
                               resultproperty="result">
@@ -282,7 +340,7 @@
                             <arg line="-c ${custom_modules}"/>
                             <arg line="-o ${json}/@{collection}"/>
                             <arg line="-r ${collection.version}"/>
-                            <arg value="-v"/>
+                            <arg value="${verbose}"/>
                         </exec>
                     </try>
                     <finally>
@@ -370,8 +428,8 @@
         </for>
     </target>
     <target name="patch-freeform" description="Correct json syntax of tasks with free-form keys" depends="-config">
-        <replaceregexp file="${modules}/modules/ansible.core/include_tasks.json" match="\](?!.*\])," replace="\]" byline="no" flags="gs"/>
-        <replaceregexp file="${modules}/modules/ansible.core/raw.json" match="\](?!.*\])," replace="\]" byline="no" flags="gs"/>
+        <replaceregexp file="${modules}/modules/ansible.builtin/include_tasks.json" match="\](?!.*\])," replace="\]" byline="no" flags="gs"/>
+        <replaceregexp file="${modules}/modules/ansible.builtin/raw.json" match="\](?!.*\])," replace="\]" byline="no" flags="gs"/>
     </target>
     <target name="build-all" description="Run all build steps">
         <runtarget target="-config"/>

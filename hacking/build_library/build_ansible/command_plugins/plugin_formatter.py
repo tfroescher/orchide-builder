@@ -341,6 +341,7 @@ def jinja2_environment(template_dir, typ, plugin_type):
         templates['category_list'] = env.get_template('%s_by_category.json.j2' % name)
         templates['category_full_list'] = env.get_template('%s_by_category_groups.json.j2' % name)
         #templates['support_list'] = env.get_template('%s_by_support.rst.j2' % name)
+        # list of modules for parser
         templates['list_of_CATEGORY_modules'] = env.get_template('list_of_CATEGORY_%s.json.j2' % name)
 
     else:
@@ -464,14 +465,14 @@ def process_plugins(module_map, templates, outputname, output_dir, ansible_versi
         fname = module_map[module]['path']
         display.vvvvv(pp.pformat(('process_plugins info: ', module_map[module])))
 
-        # crash if module is missing documentation and not explicitly hidden from docs index
+        # if module is missing documentation and not explicitly hidden from docs index
         if module_map[module]['doc'] is None:
             display.error("%s MISSING DOCUMENTATION" % (fname,))
             _doc = {plugin_type: module,
                     'version_added': '2.4',
                     'filename': fname}
             module_map[module]['doc'] = _doc
-            # continue
+            continue
 
         # Going to reference this heavily so make a short name to reference it by
         doc = module_map[module]['doc']
@@ -868,6 +869,7 @@ class DocumentPlugins(Command):
             #category_list_name_template = 'list_of_%s_' + '%ss.rst' % plugin_type
             # TODO Check if required
             category_list_name_template = '_list_of_%s_' + '%ss.json' % plugin_type
+            display.display('Generating list of all modules per collection.')
             process_categories(plugin_info, categories, templates, output_dir, category_list_name_template, plugin_type)
 
             # Render all the categories for modules

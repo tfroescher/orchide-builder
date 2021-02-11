@@ -4,9 +4,9 @@
 
         "general": [
 
-            {%- for module in category['_modules'] | sort %}
+            {%- for module in category['_modules'] | sort %}{%- if module_info[module]['doc']%}
 
-            { "name": "@{ module }@", "deprecated": "{% if module_info[module]['doc'].deprecated %}yes{% else %}no{% endif %}" }{% if loop.nextitem is defined %},{% endif %}
+            { "name": "@{ module }@", "deprecated": "{% if module_info[module]['doc'].deprecated %}yes{% else %}no{% endif %}" }{% if loop.nextitem is defined %},{% endif %}{% endif %}
             {% endfor %}
 
         ]{% if subcategories.items() %},{% endif %}
