@@ -3,9 +3,11 @@
          xmlns:if="ant:if" xmlns:unless="ant:unless"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="antlib:org.apache.tools.ant"
+         xmlns:m="antlib:macros"
          xsi:schemaLocation="antlib:org.apache.tools.ant antlib:org.apache.tools.ant">
     <property file="${tooldir}/custom.properties"/>
-    <property file="${tooldir}/build.properties"/>
+    <property name="configfile" value="build.properties"/>
+    <property file="${tooldir}/${configfile}"/>
     <tstamp>
         <format property="timestamp" pattern="yyyyMMdd-HHmmss" locale="en"/>
         <format property="datestamp" pattern="yyyyMMdd" locale="en"/>
@@ -28,12 +30,28 @@
             </fileset>
         </classpath>
     </typedef>
-    <presetdef name="log">
+    <presetdef name="log" uri="antlib:macros">
         <echo taskname="log"/>
     </presetdef>
     <propertyhelper>
         <nested/>
     </propertyhelper>
+    <macrodef name="galaxy" uri="antlib:macros">
+        <attribute name="collection"/>
+        <sequential>
+            <m:log message="Downloading @{collection} ..."/>
+            <exec dir="." errorproperty="error" executable="ansible-galaxy" outputproperty="output"
+                  resolveexecutable="true" taskname="ansible-galaxy" failonerror="no"
+                  logerror="yes" resultproperty="result">
+                <env key="ANSIBLE_CONFIG" file="ansible.cfg"/>
+                <arg value="collection"/>
+                <arg value="install"/>
+                <arg line="-p ${build}/collections"/>
+                <arg value="-v"/>
+                <arg value="@{collection}"/>
+            </exec>
+        </sequential>
+    </macrodef>
     <target name="clean" description="Clean" unless="${clean.disabled}">
         <delete dir="${build}" failonerror="false"/>
     </target>
@@ -81,7 +99,51 @@
                 <property name="references" value="${dist}/references"/>
             </else>
         </if>
-        <property name="modules" value="${references}/module-${ansible_version_trimmed}"/>
+        <property name="ansible_version_postfix" value=""/>
+        <if>
+            <not>
+                <equals arg1="${ansible_version_trimmed}" arg2=""/>
+            </not>
+            <then>
+                <var name="ansible_version_postfix" value="-${ansible_version_trimmed}"/>
+            </then>
+        </if>
+        <property name="modules" value="${references}/module${ansible_version_postfix}"/>
+    </target>
+    <target name="prepare-ansible-release" description="Load collection list" depends="-config"
+            unless="${prepare-ansible-release.disabled}">
+        <property name="target_ansible_version" value="3.0.0"/>
+        <!-- remove collection list loaded from properties file, use this list for Ansible version x.y.z -->
+        <var name="module.definitions" unset="yes"/>
+        <loadfile property="module.definitions" srcfile="res/requirements-ans${target_ansible_version}.txt">
+            <filterchain>
+                <trim/>
+                <striplinecomments>
+                    <comment value="#"/>
+                </striplinecomments>
+                <suffixlines suffix=","/>
+                <sortfilter/>
+                <striplinebreaks/>
+                <replaceregex pattern=",$" replace=""/>
+            </filterchain>
+        </loadfile>
+        <m:log><![CDATA[
+
+${module.definitions}
+
+
+        ]]></m:log>
+    </target>
+    <target name="get-ansible-release" description="Download collections from galaxy with version of a ansible release" depends="-config"
+            unless="${get-ansible-release.disabled}">
+        <for param="collection" list="${module.definitions}">
+            <sequential>
+                <m:galaxy collection="@{collection}"/>
+            </sequential>
+        </for>
+    </target>
+    <target name="prepare-ansible-builtin" description="Define/add ansible.builtin to use">
+        <var name="module.definitions" value="ansible.builtin,${module.definitions}"/>
     </target>
     <target name="prepare-collections" description="Download collections from galaxy" depends="-config" unless="${prepare-collections.disabled}">
         <exec dir="." errorproperty="error" executable="ansible" outputproperty="output" resolveexecutable="true">
@@ -93,16 +155,16 @@
         <var name="version_references_old" value="version_references.properties"/>
         <var name="version_references_new" value="${build}/version_references.properties"/>
         <property file="${version_references_old}" prefix="versionref"/>
-        <log message="${error}"/>
-        <log message="${output}"/>
+        <m:log message="${error}"/>
+        <m:log message="${output}"/>
         <delete file="${version_logfile}" failonerror="no"/>
         <delete file="${version_download}" failonerror="no"/>
         <delete file="${version_references_new}" failonerror="no"/>
-        <for param="collection" list="${galaxy.collection.list}">
+        <for param="collection" list="${module.definitions}">
             <sequential>
                 <var name="error" unset="yes"/>
                 <var name="output" unset="yes"/>
-                <log message="Downloading @{collection} ..."/>
+                <m:log message="Downloading @{collection} ..."/>
                 <exec dir="." errorproperty="error" executable="ansible-galaxy" outputproperty="output"
                       resolveexecutable="true" taskname="ansible-galaxy" failonerror="no"
                       logerror="yes" resultproperty="result">
@@ -115,13 +177,13 @@
                 <switch value="${result}">
                     <case value="0"></case>
                     <case value="1">
-                        <log message="Result code 1 - collection with name @{collection} not found on galaxy"/>
+                        <m:log message="Result code 1 - collection with name @{collection} not found on galaxy"/>
                     </case>
                     <case value="250">
-                        <log message="Result code indicates error: ${result}"/>
+                        <m:log message="Result code indicates error: ${result}"/>
                     </case>
                     <default>
-                        <log message="Unknown result code indicates error: ${result}"/>
+                        <m:log message="Unknown result code indicates error: ${result}"/>
                     </default>
                 </switch>
                 <if>
@@ -129,68 +191,23 @@
                         <equals arg1="${error}" arg2=""/>
                     </not>
                     <then>
-                        <log message="ansible-galaxy error message: ${error}"/>
+                        <m:log message="ansible-galaxy error message: ${error}"/>
                     </then>
                 </if>
-                <!--
-                  [log] /home/dev/.local/share/virtualenvs/tmp-SWmmaX4T/lib/python3.6/site-packages/ansible
-      [log] Downloading amazon.aws ...
-      [log] DEBUG: Starting galaxy collection install process
-      [log] Process install dependency map
-      [log] Starting collection install process
-      [log] Installing 'amazon.aws:1.2.0' to '/home/dev/tmp/build/collections/ansible_collections/amazon/aws'
-      [log] Downloading https://galaxy.ansible.com/download/amazon-aws-1.2.0.tar.gz to /home/dev/.ansible/tmp/ansible-local-397pw99priw/tmpw7julk6n
-      [log] amazon.aws (1.2.0) was installed successfully
-      [log] Installing 'ansible.netcommon:1.3.0' to '/home/dev/tmp/build/collections/ansible_collections/ansible/netcommon'
-      [log] Downloading https://galaxy.ansible.com/download/ansible-netcommon-1.3.0.tar.gz to /home/dev/.ansible/tmp/ansible-local-397pw99priw/tmpw7julk6n
-      [log] ansible.netcommon (1.3.0) was installed successfully
-                -->
+
                 <echo message="${output}" file="${build}/logsnippet.txt"/>
-                <if>
-                    <contains string="${output}" substring="Installing "/>
-                    <then>
-                        <var name="install" unset="yes"/>
-                        <loadfile property="install" srcfile="${build}/logsnippet.txt">
-                            <filterchain>
-                                <linecontainsregexp>
-                                    <regexp pattern=".*was installed successfully.*"/>
-                                </linecontainsregexp>
-                            </filterchain>
-                        </loadfile>
-                        <log message="${install}"/>
-                        <log file="${version_logfile}" append="yes"><![CDATA[${install}
-]]></log>
-                    </then>
-                    <else>
-                        <if>
-                            <contains string="${output}" substring="as it is already installed"/>
-                            <then>
-                                <log message="   Skipping, @{collection} is already installed"/>
-                                <if>
-                                    <contains string="${output}" substring="was successful installed"/>
-                                    <then>
-                                        <log message="${output}"/>
-                                    </then>
-                                </if>
-                                <var name="error" unset="yes"/>
-                                <var name="output" unset="yes"/>
-                                <exec dir="." errorproperty="error" executable="ansible-galaxy" outputproperty="output"
-                                      resolveexecutable="true" taskname="ansible-galaxy" failonerror="no"
-                                      logerror="yes" resultproperty="result">
-                                    <env key="ANSIBLE_CONFIG" file="ansible.cfg"/>
-                                    <arg value="collection"/>
-                                    <arg value="list"/>
-                                    <arg value="@{collection}"/>
-                                </exec>
-                                <echo message="Galaxy ${output}"/>
-                                <echo message="${output}" file="${build}/logsnippet.txt"/>
-                            </then>
-                            <else>
-                                <log message="${output}"/>
-                            </else>
-                        </if>
-                    </else>
-                </if>
+                <var name="error" unset="yes"/>
+                <var name="output" unset="yes"/>
+                <exec dir="." errorproperty="error" executable="ansible-galaxy" outputproperty="output"
+                      resolveexecutable="true" taskname="ansible-galaxy" failonerror="no"
+                      logerror="yes" resultproperty="result">
+                    <env key="ANSIBLE_CONFIG" file="ansible.cfg"/>
+                    <arg value="collection"/>
+                    <arg value="list"/>
+                    <arg value="@{collection}"/>
+                </exec>
+                <echo message="Galaxy ${output}"/>
+                <echo message="${output}" file="${build}/logsnippet.txt"/>
                 <var name="collection-version-line" unset="yes"/>
                 <loadfile property="collection-version-line" srcfile="${build}/logsnippet.txt">
                     <filterchain>
@@ -227,10 +244,10 @@
                         <var name="version_update_message" value=" (updated from ${version_ref})"/>
                     </then>
                 </if>
-                <log file="${version_download}" append="yes"><![CDATA[- @{collection} ${collection-version}${version_update_message}
-]]></log>
-                <log file="${version_references_new}" append="yes"><![CDATA[@{collection}=${collection-version}
-]]></log>
+                <m:log file="${version_download}" append="yes"><![CDATA[- @{collection} ${collection-version}${version_update_message}
+]]></m:log>
+                <m:log file="${version_references_new}" append="yes"><![CDATA[@{collection}=${collection-version}
+]]></m:log>
 
                 <!-- Result 0: Install, skipping -->
                 <!-- Result 1: error failed to find collection with name -->
@@ -245,19 +262,32 @@
             <arg line="-c &quot;ansible --version | grep -o -e '/.*site-packages.*'&quot;"/>
         </exec>
         <property name="ansible_module_path" value="${output}"/>
-        <log message="Using Ansible module path ${ansible_module_path} ..."/>
+        <m:log message="Using Ansible module path ${ansible_module_path} ..."/>
         <mkdir dir="${build}/collections/ansible_collections/ansible/builtin/plugins"/>
         <copy todir="${build}/collections/ansible_collections/ansible/builtin/plugins" preservelastmodified="yes">
             <fileset dir="${ansible_module_path}">
                 <include name="module*/**"/>
             </fileset>
         </copy>
+        <loadfile property="builtin_version" srcfile="${build}/collections/ansible_collections/ansible/builtin/plugins/module_utils/ansible_release.py">
+            <filterchain>
+                <striplinecomments>
+                    <comment value="#"/>
+                </striplinecomments>
+                <linecontains>
+                    <contains value="__version__"></contains>
+                </linecontains>
+                <replaceregex pattern=".*'(.*)'.*" replace="\1" flags="" byline="yes"/>
+                <striplinebreaks/>
+            </filterchain>
+        </loadfile>
+        <m:log><![CDATA[Ansible builtin version detected: ${builtin_version}]]></m:log>
         <echo file="${build}/collections/ansible_collections/ansible/builtin/MANIFEST.json"><![CDATA[
 {
     "collection_info": {
     "namespace": "ansible",
     "name": "builtin",
-    "version": "2.10.2",
+    "version": "${builtin_version}",
     "dependencies": {}
     }
 }
@@ -272,18 +302,19 @@
         <mkdir dir="${modules}/modules"/>
         <var name="version_logfile" value="${build}/build-ansible-collection-versions.log"/>
         <echo file="${modules}/collections.json"><![CDATA[[]]></echo>
-        <log file="${version_logfile}"><![CDATA[# OrchidE definition build from ${timestamp}
-]]></log>
-        <for param="collection" list="${module.definitions}">
+        <m:log file="${version_logfile}"><![CDATA[# OrchidE definition build from ${timestamp}
+]]></m:log>
+        <property name="orchide_only" value="False"/>
+        <for param="input-collection" list="${module.definitions}">
             <sequential>
-                <log message="Creating json files ..."/>
-                <propertyregex input="@{collection}" property="collection_path" override="yes" regexp="\."
-                               replace="\/"/>
-                <log message="collection path: ${collection_path}."/>
-                <mkdir dir="${modules}/parsers/@{collection}"/>
+                <m:log message="Creating json files for @{input-collection} ..."/>
+                <propertyregex input="@{input-collection}" property="collection" override="yes" regexp="\:.*$" replace="" defaultValue="@{input-collection}"/>
+                <propertyregex input="${collection}" property="collection_path" override="yes" regexp="\." replace="\/"/>
+                <m:log message="collection path: '${collection_path}'."/>
+                <mkdir dir="${modules}/parsers/${collection}"/>
                 <echo file="${modules}/collections.json" append="yes"><![CDATA[
-    "@{collection}",]]></echo>
-                <mkdir dir="${modules}/modules/@{collection}"/>
+    "${collection}",]]></echo>
+                <mkdir dir="${modules}/modules/${collection}"/>
                 <var name="collection.version" value=""/>
                 <trycatch>
                     <try>
@@ -296,28 +327,28 @@
                             <env key="ANSIBLE_CONFIG" file="ansible.cfg"/>
                             <arg value="collection"/>
                             <arg value="list"/>
-                            <arg value="@{collection}"/>
+                            <arg value="${collection}"/>
                         </exec>
                     </try>
                     <finally>
-                        <propertyregex input="${output}" property="collection.version" regexp="@{collection}\ +([0-9\.]+).*" select="\1" override="yes" defaultValue="0.0.0"/>
-                        <log message="Processing @{collection} - ${collection.version} ..."/>
+                        <propertyregex input="${output}" property="collection.version" regexp="${collection}\ +([0-9\.]+).*" select="\1" override="yes" defaultValue="0.0.0"/>
+                        <m:log message="Processing ${collection} - ${collection.version} ..."/>
                         <if>
                             <not>
                                 <equals arg1="" arg2="${error}"/>
                             </not>
                             <then>
-                                <log message="${error}"/>
+                                <m:log message="${error}"/>
                             </then>
                         </if>
-                        <log file="${version_logfile}" append="yes"><![CDATA[@{collection}=${collection.version}
-]]></log>
+                        <m:log file="${version_logfile}" append="yes"><![CDATA[${collection}=${collection.version}
+]]></m:log>
                         <if>
                             <not>
                                 <equals arg1="0" arg2="${result}"/>
                             </not>
                             <then>
-                                <log message="Result ${result}"/>
+                                <m:log message="Result ${result}"/>
                             </then>
                         </if>
                     </finally>
@@ -338,26 +369,27 @@
                             <arg line="--template-dir ./docs/templates"/>
                             <arg line="--module-dir ${build}/collections/ansible_collections/${collection_path}/plugins/modules"/>
                             <arg line="-c ${custom_modules}"/>
-                            <arg line="-o ${json}/@{collection}"/>
+                            <arg line="-o ${json}/${collection}"/>
                             <arg line="-r ${collection.version}"/>
+                            <arg line="-m ${orchide_only}"/>
                             <arg value="${verbose}"/>
                         </exec>
                     </try>
                     <finally>
-                        <log message="${output}"/>
-                        <log message="${error}"/>
-                        <log file="${build}/build-ansible-warnings.log" append="yes"><![CDATA[${error}
-]]></log>
-                        <log message="Result ${result}"/>
+                        <m:log message="${output}"/>
+                        <m:log message="${error}"/>
+                        <m:log file="${build}/build-ansible-warnings.log" append="yes"><![CDATA[${error}
+]]></m:log>
+                        <m:log message="Result ${result}"/>
                     </finally>
                 </trycatch>
-                <move todir="${modules}/parsers/@{collection}">
-                    <fileset dir="${json}/@{collection}">
+                <move todir="${modules}/parsers/${collection}">
+                    <fileset dir="${json}/${collection}">
                         <include name="_list_of_all*"/>
                     </fileset>
                 </move>
-                <move todir="${modules}/modules/@{collection}">
-                    <fileset dir="${json}/@{collection}">
+                <move todir="${modules}/modules/${collection}">
+                    <fileset dir="${json}/${collection}">
                         <include name="*.json"/>
                     </fileset>
                 </move>
@@ -368,7 +400,7 @@
                 <tailfilter lines="1"/>
             </filterchain>
         </loadfile>
-        <log message="Fixing last line ${fixlastline} json format ..."/>
+        <m:log message="Fixing last line ${fixlastline} json format ..."/>
         <replaceregexp file="${modules}/collections.json" replace="${fixlastline},,,,,," match=".*(${fixlastline}).*"
                        byline="yes" flags="gi"/>
         <replaceregexp file="${modules}/collections.json" replace="" match=",,,,,,," byline="yes" flags="gi"/>
@@ -379,6 +411,12 @@
     <target name="create-static" description="Copies static definition files for bundling" depends="-config">
         <copy todir="${references}">
             <fileset dir="src/main/resources/static/references"/>
+        </copy>
+    </target>
+    <target name="create-210-package" description="Creates backward compatiblity directory structure">
+        <copy todir="${dist}/references/external/module-210">
+            <fileset dir="${dist}/references/external/module">
+            </fileset>
         </copy>
     </target>
     <target name="jar" description="Create final distribution jar with all definitions.">
@@ -403,7 +441,7 @@
                 <var name="toValidateJson" unset="true"/>
                 <loadfile property="toValidateJson" srcfile="@{jsonfile}"/>
                 <var name="jsonvalidate" unset="true"/>
-                <log><![CDATA[Validating json @{jsonfile}.... ]]></log>
+                <m:log><![CDATA[Validating json @{jsonfile}.... ]]></m:log>
                 <script language="javascript" taskname="jsonvalidate">
                     <![CDATA[
                     json = project.getProperty("toValidateJson");
@@ -416,11 +454,11 @@
                     project.setProperty("jsonvalidate", isValid);
                     ]]>
                 </script>
-                <log message="  finished."/>
+                <m:log message="  finished."/>
                 <if>
                     <equals arg1="${jsonvalidate}" arg2="false"/>
                     <then>
-                        <log message="ERROR: JSON validation error"/>
+                        <m:log message="ERROR: JSON validation error"/>
                         <fail><![CDATA[ ERROR: JSON validation error in @{jsonfile}.]]></fail>
                     </then>
                 </if>
@@ -440,6 +478,20 @@
         <runtarget target="patch-freeform"/>
         <runtarget target="create-static"/>
         <runtarget target="validate-json"/>
+        <runtarget target="jar"/>
+    </target>
+    <target name="build-4release" description="Run all build steps to build a package for Ansible releases">
+        <runtarget target="-config"/>
+        <runtarget target="clean"/>
+        <runtarget target="prepare-ansible-base"/>
+        <runtarget target="prepare-ansible-release"/>
+        <runtarget target="prepare-collections"/>
+        <runtarget target="prepare-ansible-builtin"/>
+        <runtarget target="create-definitions"/>
+        <runtarget target="patch-freeform"/>
+        <runtarget target="create-static"/>
+        <runtarget target="validate-json"/>
+        <runtarget target="create-210-package"/>
         <runtarget target="jar"/>
     </target>
 </project>

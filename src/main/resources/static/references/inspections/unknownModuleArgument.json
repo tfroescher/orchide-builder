@@ -1,7 +1,7 @@
 {
   "excludes": [
+    "ansible.builtin.set_fact",
     "local_action",
-    "set_fact",
-    "ansible.builtin.set_fact"
+    "set_fact"
   ]
 }

@@ -183,10 +183,27 @@ def get_plugin_info(module_dir, limit_to=None, verbose=False):
         if module_path.endswith('__init__.py'):
             continue
 
+        display.display("Processing %s ..." % module_path)
+
         # Do not list blacklisted modules
         module = os.path.splitext(os.path.basename(module_path))[0]
-        if module in plugin_docs.BLACKLIST['MODULE'] or module == 'base':
+        display.display("Base %s " % module)
+
+        if module == 'base':
             continue
+
+        try:
+            if module in plugin_docs.BLACKLIST['MODULE']:
+                continue
+        except:
+            dummy = 0
+
+        try:
+            if module in plugin_docs.REJECTLIST['MODULE']:
+                continue
+        except:
+            dummy = 0
+
 
         # If requested, limit module documentation building only to passed-in
         # modules.
@@ -331,6 +348,7 @@ def jinja2_environment(template_dir, typ, plugin_type):
         env.filters['documented_type'] = documented_type
         env.tests['list'] = test_list
         templates['plugin'] = env.get_template('plugin.json.j2')
+        templates['orchide'] = env.get_template('orchide.json.j2')
         #templates['plugin_deprecation_stub'] = env.get_template('plugin_deprecation_stub.rst.j2')
 
         if plugin_type == 'module':
@@ -457,7 +475,7 @@ def process_returndocs(returndocs, full_key=None):
                     process_returndocs(suboptions[0], full_key=full_key_k)
 
 
-def process_plugins(module_map, templates, outputname, output_dir, ansible_version, plugin_type, custom=True, collection_version=""):
+def process_plugins(module_map, templates, outputname, output_dir, ansible_version, plugin_type, custom=True, collection_version="", orchideOnly=False):
     for module_index, module in enumerate(module_map):
 
         show_progress(module_index)
@@ -569,11 +587,20 @@ def process_plugins(module_map, templates, outputname, output_dir, ansible_versi
 
         display.v('about to template %s' % module)
         display.vvvvv(pp.pformat(doc))
-        try:
-            text = templates['plugin'].render(doc)
-        except Exception as e:
-            display.warning(msg="Could not parse %s due to %s" % (module, e))
-            continue
+        display.v('Is Orchide mode = %s' % orchideOnly)
+        if orchideOnly == "true":
+            try:
+                text = templates['orchide'].render(doc)
+            except Exception as e:
+                display.warning(msg="Could not parse %s due to %s" % (module, e))
+                continue
+
+        else:
+            try:
+                text = templates['plugin'].render(doc)
+            except Exception as e:
+                display.warning(msg="Could not parse %s due to %s" % (module, e))
+                continue
 
         if LooseVersion(jinja2.__version__) < LooseVersion('2.10'):
             # jinja2 < 2.10's indent filter indents blank lines.  Cleanup
@@ -785,6 +812,8 @@ class DocumentPlugins(Command):
         parser.add_argument("-c", "--custom-definitions", action='store', dest='custom', default=True, help="Create custom module definitions for OrchidE")
         parser.add_argument("-r", "--collection-version", action='store', dest='collection_version', default="", help="Collection version")
 
+        parser.add_argument('-m', action='store', dest="orchide", default="false", help='Limit building to raw data')
+
     @staticmethod
     def main(args):
         if not args.template_dir:
@@ -877,7 +906,7 @@ class DocumentPlugins(Command):
 
         # Render all the individual plugin pages
         display.v('Generating module/plugin pages')
-        process_plugins(plugin_info, templates, outputname, output_dir, args.ansible_version, plugin_type, args.custom, args.collection_version)
+        process_plugins(plugin_info, templates, outputname, output_dir, args.ansible_version, plugin_type, args.custom, args.collection_version, args.orchide)
 
 
         return 0

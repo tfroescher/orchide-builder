@@ -10,9 +10,11 @@ cat << EOF
  Options:
    -h                               display this help text
    -i                               build built-in variant for OrchidE including custom collections
+   -a                               Ansible version to build collections for
 
  Commands:
    build-all                        Builds the definition package (clean, download collections, create definitions, pack jar)
+   build-4release                   Builds the definition package for a specific Ansible version (clean, download collections, create definitions, pack jar)
 
 
 EOF
@@ -27,6 +29,7 @@ LIB="-lib $ANTLIB"
 ARGS=""
 JVM_ARGS=""
 PARAMS=""
+ANSIBLE_VERSION=""
 
 if [ $# == 0 ]; then
     help
@@ -57,6 +60,10 @@ for (( i=0; i<$# ; i++ )) ; do
             BUILDFILE="${params[i+1]}"
             unset params[i+1]
             ;;
+        -a )
+            ANSIBLE_VERSION=-Dtarget_ansible_version=${params[i+1]}
+            unset params[i+1]
+            ;;
         * )
             if [[ "${params[i]}" =~ .*"-D".* ]] ; then
                 JVM_ARGS="${JVM_ARGS} ${params[i]}"
@@ -67,10 +74,17 @@ for (( i=0; i<$# ; i++ )) ; do
     esac
 done
 
-echo ant $LIB -Dbasedir=$TOOLDIR -Dtooldir=$TOOLDIR -f $BUILDFILE $JVM_ARGS $ARGS $PARAMS
+if [ -n $ANSIBLE_VERSION ]; then
 
+echo ant $LIB -Dbasedir=$TOOLDIR -Dtooldir=$TOOLDIR -f $BUILDFILE $ANSIBLE_VERSION $JVM_ARGS $ARGS $PARAMS
+ant $LIB -Dbasedir=$TOOLDIR -Dtooldir=$TOOLDIR -f $BUILDFILE  $ANSIBLE_VERSION $JVM_ARGS $ARGS $PARAMS
+
+else
+
+echo ant $LIB -Dbasedir=$TOOLDIR -Dtooldir=$TOOLDIR -f $BUILDFILE $JVM_ARGS $ARGS $PARAMS
 ant $LIB -Dbasedir=$TOOLDIR -Dtooldir=$TOOLDIR -f $BUILDFILE $JVM_ARGS $ARGS $PARAMS
 
+fi
 
 
 
