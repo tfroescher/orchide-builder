@@ -40,6 +40,9 @@
         <attribute name="collection"/>
         <sequential>
             <m:log message="Downloading @{collection} ..."/>
+            <var name="error" unset="yes"/>
+            <var name="output" unset="yes"/>
+            <var name="result" unset="yes"/>
             <exec dir="." errorproperty="error" executable="ansible-galaxy" outputproperty="output"
                   resolveexecutable="true" taskname="ansible-galaxy" failonerror="no"
                   logerror="yes" resultproperty="result">
@@ -162,6 +165,8 @@ ${module.definitions}
         <delete file="${version_references_new}" failonerror="no"/>
         <for param="collection" list="${module.definitions}">
             <sequential>
+                <m:galaxy collection="@{collection}"/>
+                <!--
                 <var name="error" unset="yes"/>
                 <var name="output" unset="yes"/>
                 <m:log message="Downloading @{collection} ..."/>
@@ -174,8 +179,11 @@ ${module.definitions}
                     <arg line="-p ${build}/collections"/>
                     <arg value="@{collection}"/>
                 </exec>
+                -->
                 <switch value="${result}">
-                    <case value="0"></case>
+                    <case value="0">
+                        <m:log message="Result code 0 - collection @{collection} successful installed"/>
+                    </case>
                     <case value="1">
                         <m:log message="Result code 1 - collection with name @{collection} not found on galaxy"/>
                     </case>
@@ -196,17 +204,20 @@ ${module.definitions}
                 </if>
 
                 <echo message="${output}" file="${build}/logsnippet.txt"/>
+                <var name="result" unset="yes"/>
                 <var name="error" unset="yes"/>
                 <var name="output" unset="yes"/>
+                <propertyregex input="@{collection}" property="collection_name" regexp="(.*):" select="\1" override="yes"/>
                 <exec dir="." errorproperty="error" executable="ansible-galaxy" outputproperty="output"
                       resolveexecutable="true" taskname="ansible-galaxy" failonerror="no"
                       logerror="yes" resultproperty="result">
                     <env key="ANSIBLE_CONFIG" file="ansible.cfg"/>
                     <arg value="collection"/>
                     <arg value="list"/>
-                    <arg value="@{collection}"/>
+                    <!--                    <arg value="-vvv"/>-->
+                    <arg value="${collection_name}"/>
                 </exec>
-                <echo message="Galaxy ${output}"/>
+                <echo message="Galaxy logsnippet for version detection: ${output}"/>
                 <echo message="${output}" file="${build}/logsnippet.txt"/>
                 <var name="collection-version-line" unset="yes"/>
                 <loadfile property="collection-version-line" srcfile="${build}/logsnippet.txt">
@@ -222,7 +233,7 @@ ${module.definitions}
                         <loadfile property="collection-version-line" srcfile="${build}/logsnippet.txt">
                             <filterchain>
                                 <linecontainsregexp>
-                                    <regexp pattern="@{collection} *[0-9].*"/>
+                                    <regexp pattern="${collection_name} *[0-9].*"/>
                                 </linecontainsregexp>
                             </filterchain>
                         </loadfile>
@@ -231,22 +242,21 @@ ${module.definitions}
                 <var name="collection-version" value=""/>
                 <propertyregex input="${collection-version-line}" property="collection-version" regexp="^Installing '(.*)\:(.*)' to.*$" select="\2" global="yes" override="yes"
                                defaultValue=""/>
-                <propertyregex input="${collection-version-line}" property="collection-version" regexp="^@{collection} *([0-9\.]*) *$" select="\1" global="yes" override="yes"/>
-                <echo message="Got @{collection} ${collection-version}"/>
-                <propertycopy property="version_ref" from="versionref.@{collection}" override="yes" silent="yes"/>
+                <propertyregex input="${collection-version-line}" property="collection-version" regexp="^${collection_name} *([0-9\.]*) *$" select="\1" global="yes" override="yes"/>
+                <m:log><![CDATA["Got ${collection_name} : v${collection-version}]]></m:log>
+                <propertycopy property="version_ref" from="versionref.${collection_name}" override="yes" silent="yes"/>
                 <var name="version_update_message" value=""/>
                 <if>
                     <not>
                         <equals arg1="${collection-version}" arg2="${version_ref}"/>
-
                     </not>
                     <then>
                         <var name="version_update_message" value=" (updated from ${version_ref})"/>
                     </then>
                 </if>
-                <m:log file="${version_download}" append="yes"><![CDATA[- @{collection} ${collection-version}${version_update_message}
+                <m:log file="${version_download}" append="yes"><![CDATA[- ${collection_name} ${collection-version}${version_update_message}
 ]]></m:log>
-                <m:log file="${version_references_new}" append="yes"><![CDATA[@{collection}=${collection-version}
+                <m:log file="${version_references_new}" append="yes"><![CDATA[${collection_name}=${collection-version}
 ]]></m:log>
 
                 <!-- Result 0: Install, skipping -->
