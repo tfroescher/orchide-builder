@@ -84,7 +84,7 @@
             @{ descriptionLine | quote_backslash | html_ify }@{% if loop.nextitem is defined %}{% endif -%}
         {%- endfor -%}",
         "docuri": "@{ docuri }@",
-        "plainexamples": "@{ (plainexamples | quote_backslash | html_ify)[:-2] }@",
+        "plainexamples": "@{ (plainexamples | quote_backslash | html_ify) }@",
         "metadata": "@{ metadata  }@",
         "notes": "{% if notes %}<ul>{%- for line in notes -%}
         <li>@{ line | quote_backslash | html_ify }@{% if loop.nextitem is defined %}<br/>{% endif -%}</li>
