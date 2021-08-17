@@ -8,21 +8,19 @@ The tool generates meta information from Ansible Galaxy collection to be used by
 
 ## Getting started - ready to use definitions
 
+### Compatiblity of releases
+
+OrchidE-Builder packages for Ansible 4.4.0, 20210816 and newer **require** at least 
+[OrchidE plugin](https://plugins.jetbrains.com/plugin/12626-orchide--ansible-language-support) version 2020.1.5.
+
+
 ### Installation
 
 To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 
-1. Download the latest definition packge from [releases](https://github.com/tfroescher/orchide-builder/releases/latest)
-1. Put the downloaded jar into the plugin lib folder of OrchidE: [&lt;IntelliJ user plugins folder>/orchide/lib](https://www.jetbrains.com/help/idea/tuning-the-ide.html#plugins-directory). 
-
-    *Tip:* to find the plugin base folder - open IntelliJ -> Help -> Edit custom properties. 
-    Either it shows you the path the properties file, which is in the plugins root folder or it opens an existing properties file which is located in the plugin root folder.
-1. Restart IntelliJ
-
-New definition files will now be used.
-
-#### Alternative Method (See https://github.com/tfroescher/orchide-builder/issues/1)
-
+1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/latest) or a specific Ansible version [4.4.0](https://github.com/tfroescher/orchide-builder/releases/4.4.0),
+   [4.0.0](https://github.com/tfroescher/orchide-builder/releases/4.0.0),
+   [3.4.0](https://github.com/tfroescher/orchide-builder/releases/3.4.0).
 1. Create a directory on your filesystem - p.e. `~/.orchide` and put the downloaded .jar there.
 1. Open IDE settings > Languages & Frameworks > OrchidE > Extension.
 1. Add the path to your newly created directory.
@@ -63,29 +61,19 @@ Any collection that documents the meta information as Ansible can be used as a s
 
 1. Configure the Ansible collection
 
-    1. Create custom.properties file from the sample file in the root folder
-    1. Add your collections to build 
+    1. Create a new configuration file from an existing one in the res folder 
+       * for latest version copy a file with *date version*
+       * for a list of collections with specific version copy a file with Ansible version
+    1. Add / remove collections you want 
 1. Run
     ```shell
-    $ ./build.sh build-all
+    $ ./build.sh build-4release -a <version number> 
+    $ ./build.sh build-4release -a 20210816 
     ``` 
-1. Copy the built jar (./build/dist/orchide-definitions.jar) to the OrchidE's plugin lib folder [&lt;IntelliJ plugins folder>/orchide/lib](https://www.jetbrains.com/help/idea/tuning-the-ide.html#plugins-directory)
-
-## Configuration
-
-See [custom.properties.sample](custom.properties.sample) for configuration options.
-
-## Creating a full package 
-A full package with OrchidE's builtin Ansible Galaxy collections and your own can be created with
-
-```shell script
-$ ./build.sh -i build-all
-``` 
-
-## Limitation
-
-* The tool fetches always the latest stable Ansible Galaxy collections. Versioning is not yet supported. 
-
+   
+1. Copy the built jar (./build/dist/orchide-definitions.jar) to the OrchidE's configured extension directory. 
+   (set in Settings > Languages & Frameworks > OrchidE > Extension )
+   
 ## Reporting Issues
 
 If you're missing an Ansible Galaxy collection, experience a problem or have any other issue, please file an issue.

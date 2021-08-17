@@ -77,7 +77,7 @@ done
 if [ -n $ANSIBLE_VERSION ]; then
 
 echo ant $LIB -Dbasedir=$TOOLDIR -Dtooldir=$TOOLDIR -f $BUILDFILE $ANSIBLE_VERSION $JVM_ARGS $ARGS $PARAMS
-ant $LIB -Dbasedir=$TOOLDIR -Dtooldir=$TOOLDIR -f $BUILDFILE  $ANSIBLE_VERSION $JVM_ARGS $ARGS $PARAMS
+ant $LIB -Dbasedir=$TOOLDIR -Dtooldir=$TOOLDIR -f $BUILDFILE  $ANSIBLE_VERSION $JVM_ARGS -Denable.completePackage=true $ARGS $PARAMS
 
 else
 

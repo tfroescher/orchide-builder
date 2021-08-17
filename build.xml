@@ -113,8 +113,7 @@
         </if>
         <property name="modules" value="${references}/module${ansible_version_postfix}"/>
     </target>
-    <target name="prepare-ansible-release" description="Load collection list" depends="-config"
-            unless="${prepare-ansible-release.disabled}">
+    <target name="prepare-ansible-release" description="Load collection list" depends="-config" unless="${prepare-ansible-release.disabled}">
         <property name="target_ansible_version" value="3.0.0"/>
         <!-- remove collection list loaded from properties file, use this list for Ansible version x.y.z -->
         <var name="module.definitions" unset="yes"/>
@@ -137,8 +136,7 @@ ${module.definitions}
 
         ]]></m:log>
     </target>
-    <target name="get-ansible-release" description="Download collections from galaxy with version of a ansible release" depends="-config"
-            unless="${get-ansible-release.disabled}">
+    <target name="get-ansible-release" description="Download collections from galaxy with version of a ansible release" depends="-config" unless="${get-ansible-release.disabled}">
         <for param="collection" list="${module.definitions}">
             <sequential>
                 <m:galaxy collection="@{collection}"/>
@@ -207,7 +205,10 @@ ${module.definitions}
                 <var name="result" unset="yes"/>
                 <var name="error" unset="yes"/>
                 <var name="output" unset="yes"/>
+                <var name="collection_name" unset="yes"/>
                 <propertyregex input="@{collection}" property="collection_name" regexp="(.*):" select="\1" override="yes"/>
+                <property name="collection_name" value="@{collection}"/>
+                <m:log message="Getting version of installed collection ${collection_name} ..."/>
                 <exec dir="." errorproperty="error" executable="ansible-galaxy" outputproperty="output"
                       resolveexecutable="true" taskname="ansible-galaxy" failonerror="no"
                       logerror="yes" resultproperty="result">
@@ -242,7 +243,8 @@ ${module.definitions}
                 <var name="collection-version" value=""/>
                 <propertyregex input="${collection-version-line}" property="collection-version" regexp="^Installing '(.*)\:(.*)' to.*$" select="\2" global="yes" override="yes"
                                defaultValue=""/>
-                <propertyregex input="${collection-version-line}" property="collection-version" regexp="^${collection_name} *([0-9\.]*) *$" select="\1" global="yes" override="yes"/>
+                <propertyregex input="${collection-version-line}" property="collection-version" regexp="^${collection_name} *([0-9\.]*) *$" select="\1" global="yes"
+                               override="yes"/>
                 <m:log><![CDATA["Got ${collection_name} : v${collection-version}]]></m:log>
                 <propertycopy property="version_ref" from="versionref.${collection_name}" override="yes" silent="yes"/>
                 <var name="version_update_message" value=""/>
@@ -423,12 +425,14 @@ ${module.definitions}
             <fileset dir="src/main/resources/static/references"/>
         </copy>
     </target>
+    <!--
     <target name="create-210-package" description="Creates backward compatiblity directory structure">
         <copy todir="${dist}/references/external/module-210">
             <fileset dir="${dist}/references/external/module">
             </fileset>
         </copy>
     </target>
+    -->
     <target name="jar" description="Create final distribution jar with all definitions.">
         <jar destfile="${dist}/orchide-definitions.jar">
             <manifest>
@@ -501,7 +505,7 @@ ${module.definitions}
         <runtarget target="patch-freeform"/>
         <runtarget target="create-static"/>
         <runtarget target="validate-json"/>
-        <runtarget target="create-210-package"/>
+        <!--  <runtarget target="create-210-package"/> -->
         <runtarget target="jar"/>
     </target>
 </project>
