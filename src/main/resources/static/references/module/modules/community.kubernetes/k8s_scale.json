@@ -1,0 +1,138 @@
+{"k8s_scale": {
+        "version": "",
+        "collection_version": "2.1.1",
+        "deprecated": "yes",
+        "removedin": "",
+        "alias": "",
+        "replacedby": "kubernetes.core.k8s_scale",
+        "namespace": "community.kubernetes",
+        "categorygroup": "" ,
+        "category": "",
+        "short_description": "Set a new size for a Deployment, ReplicaSet, Replication Controller, or Job",
+        "returndocs": {
+            "result": {
+                "contains": {
+                    "api_version": {
+                        "description": "The versioned schema of this representation of an object.",
+                        "full_key": "[&quot;result&quot;, &quot;api_version&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "duration": {
+                        "description": "elapsed time of task in seconds",
+                        "full_key": "[&quot;result&quot;, &quot;duration&quot;]",
+                        "returned": "when <code>wait</code> is true",
+                        "sample": "48",
+                        "type": "int"
+                    },
+                    "kind": {
+                        "description": "Represents the REST resource this object represents.",
+                        "full_key": "[&quot;result&quot;, &quot;kind&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "metadata": {
+                        "description": "Standard object metadata. Includes name, namespace, annotations, labels, etc.",
+                        "full_key": "[&quot;result&quot;, &quot;metadata&quot;]",
+                        "returned": "success",
+                        "type": "complex"
+                    },
+                    "spec": {
+                        "description": "Specific attributes of the object. Will vary based on the <em>api_version</em> and <em>kind</em>.",
+                        "full_key": "[&quot;result&quot;, &quot;spec&quot;]",
+                        "returned": "success",
+                        "type": "complex"
+                    },
+                    "status": {
+                        "description": "Current status details for the object.",
+                        "full_key": "[&quot;result&quot;, &quot;status&quot;]",
+                        "returned": "success",
+                        "type": "complex"
+                    }
+                },
+                "description": "<p>If a change was made, will return the patched object, otherwise returns the existing object.</p>",
+                "full_key": "[&quot;result&quot;]",
+                "returned": "success",
+                "type": "complex"
+            }
+        },
+        "description": "Similar to the kubectl scale command. Use to set the number of replicas for a Deployment, ReplicaSet, or Replication Controller, or the parallelism attribute of a Job. Supports check mode.<code>wait</code> parameter is not supported for Jobs.",
+        "docuri": "k8s-scale",
+        "plainexamples": "\n- name: Scale deployment up, and extend timeout\n community.kubernetes.k8s_scale:\n    api_version: v1\n    kind: Deployment\n    name: elastic\n    namespace: myproject\n    replicas: 3\n    wait_timeout: 60\n\n- name: Scale deployment down when current replicas match\n community.kubernetes.k8s_scale:\n    api_version: v1\n    kind: Deployment\n    name: elastic\n    namespace: myproject\n    current_replicas: 3\n    replicas: 2\n\n- name: Increase job parallelism\n community.kubernetes.k8s_scale:\n    api_version: batch/v1\n    kind: job\n    name: pi-with-timeout\n    namespace: testing\n    replicas: 2\n\n# Match object using local file or inline definition\n\n- name: Scale deployment based on a file from the local filesystem\n community.kubernetes.k8s_scale:\n    src: /myproject/elastic_deployment.yml\n    replicas: 3\n    wait: no\n\n- name: Scale deployment based on a template output\n community.kubernetes.k8s_scale:\n    resource_definition: &quot;{{ lookup(&#x27;template&#x27;, &#x27;/myproject/elastic_deployment.yml&#x27;) | from_yaml }}&quot;\n    replicas: 3\n    wait: no\n\n- name: Scale deployment based on a file from the Ansible controller filesystem\n community.kubernetes.k8s_scale:\n    resource_definition: &quot;{{ lookup(&#x27;file&#x27;, &#x27;/myproject/elastic_deployment.yml&#x27;) | from_yaml }}&quot;\n    replicas: 3\n    wait: no\n\n- name: Scale deployment using label selectors (continue operation in case error occured on one resource)\n community.kubernetes.k8s_scale:\n    replicas: 3\n    kind: Deployment\n    namespace: test\n    label_selectors:\n      - app=test\n    continue_on_error: true\n",
+        "metadata": "None",
+        "notes": "<ul><li>To avoid SSL certificate validation errors when <code>validate_certs</code> is <em>True</em>, the full certificate chain for the API server must be provided via <code>ca_cert</code> or in the kubeconfig file.</li></ul>",
+        "requirements": ["python &gt;= 3.6","kubernetes &gt;= 12.0.0","PyYAML &gt;= 3.11"],
+        "authors": "<ul><li>Chris Houseknecht (@chouseknecht)<br/></li><li>Fabian von Feilitzsch (@fabianvf)</li></ul>",
+        "arguments": {
+            "api_key": ["","",[], "", "", "str", [], "Token used to authenticate with the API. Can also be specified via K8S_AUTH_API_KEY environment variable.",{
+            }],
+            "api_version": ["","",[], "", "v1", "str", ["api","version"], "Use to specify the API version.<br/>Use to create, delete, or discover an object without providing a full resource definition.<br/>Use in conjunction with <em>kind</em>, <em>name</em>, and <em>namespace</em> to identify a specific object.<br/>If <em>resource definition</em> is provided, the <em>apiVersion</em> value from the <em>resource_definition</em> will override this option.",{
+            }],
+            "ca_cert": ["","",[], "", "", "path", ["ssl_ca_cert"], "Path to a CA certificate used to authenticate with the API. The full certificate chain must be provided to avoid certificate validation errors. Can also be specified via K8S_AUTH_SSL_CA_CERT environment variable.",{
+            }],
+            "client_cert": ["","",[], "", "", "path", ["cert_file"], "Path to a certificate used to authenticate with the API. Can also be specified via K8S_AUTH_CERT_FILE environment variable.",{
+            }],
+            "client_key": ["","",[], "", "", "path", ["key_file"], "Path to a key file used to authenticate with the API. Can also be specified via K8S_AUTH_KEY_FILE environment variable.",{
+            }],
+            "context": ["","",[], "", "", "str", [], "The name of a context found in the config file. Can also be specified via K8S_AUTH_CONTEXT environment variable.",{
+            }],
+            "continue_on_error": ["","2.0.0",[], "", "False", "bool", [], "Whether to continue on errors when multiple resources are defined.",{
+            }],
+            "current_replicas": ["","",[], "", "", "int", [], "For Deployment, ReplicaSet, Replication Controller, only scale, if the number of existing replicas matches. In the case of a Job, update parallelism only if the current parallelism value matches.",{
+            }],
+            "host": ["","",[], "", "", "str", [], "Provide a URL for accessing the API. Can also be specified via K8S_AUTH_HOST environment variable.",{
+            }],
+            "kind": ["","",[], "", "", "str", [], "Use to specify an object model.<br/>Use to create, delete, or discover an object without providing a full resource definition.<br/>Use in conjunction with <em>api_version</em>, <em>name</em>, and <em>namespace</em> to identify a specific object.<br/>If <em>resource definition</em> is provided, the <em>kind</em> value from the <em>resource_definition</em> will override this option.",{
+            }],
+            "kubeconfig": ["","",[], "", "", "path", [], "Path to an existing Kubernetes config file. If not provided, and no other connection options are provided, the Kubernetes client will attempt to load the default configuration file from <em>~/.kube/config</em>. Can also be specified via K8S_AUTH_KUBECONFIG environment variable.",{
+            }],
+            "label_selectors": ["","2.0.0",[], "", "", "list", [], "List of label selectors to use to filter results.",{
+            }],
+            "name": ["","",[], "", "", "str", [], "Use to specify an object name.<br/>Use to create, delete, or discover an object without providing a full resource definition.<br/>Use in conjunction with <em>api_version</em>, <em>kind</em> and <em>namespace</em> to identify a specific object.<br/>If <em>resource definition</em> is provided, the <em>metadata.name</em> value from the <em>resource_definition</em> will override this option.",{
+            }],
+            "namespace": ["","",[], "", "", "str", [], "Use to specify an object namespace.<br/>Useful when creating, deleting, or discovering an object without providing a full resource definition.<br/>Use in conjunction with <em>api_version</em>, <em>kind</em>, and <em>name</em> to identify a specific object.<br/>If <em>resource definition</em> is provided, the <em>metadata.namespace</em> value from the <em>resource_definition</em> will override this option.",{
+            }],
+            "password": ["","",[], "", "", "str", [], "Provide a password for authenticating with the API. Can also be specified via K8S_AUTH_PASSWORD environment variable.<br/>Please read the description of the <code>username</code> option for a discussion of when this option is applicable.",{
+            }],
+            "persist_config": ["","",[], "", "", "bool", [], "Whether or not to save the kube config refresh tokens. Can also be specified via K8S_AUTH_PERSIST_CONFIG environment variable.<br/>When the k8s context is using a user credentials with refresh tokens (like oidc or gke/gcloud auth), the token is refreshed by the k8s python client library but not saved by default. So the old refresh token can expire and the next auth might fail. Setting this flag to true will tell the k8s python client to save the new refresh token to the kube config file.<br/>Default to false.<br/>Please note that the current version of the k8s python client library does not support setting this flag to True yet.<br/>The fix for this k8s python library is here: https://github.com/kubernetes-client/python-base/pull/169",{
+            }],
+            "proxy": ["","",[], "", "", "str", [], "The URL of an HTTP proxy to use for the connection. Can also be specified via K8S_AUTH_PROXY environment variable.<br/>Please note that this module does not pick up typical proxy settings from the environment (e.g. HTTP_PROXY).",{
+            }],
+            "proxy_headers": ["","2.0.0",[], "", "", "dict", [], "The Header used for the HTTP proxy.<br/>Documentation can be found here <a href='https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers'>https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers</a>.",{
+                "basic_auth": {
+                    "description": "<p>Colon-separated username:password for basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;basic_auth&quot;]",
+                    "type": "str"
+                },
+                "proxy_basic_auth": {
+                    "description": "<p>Colon-separated username:password for proxy basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_PROXY_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;proxy_basic_auth&quot;]",
+                    "type": "str"
+                },
+                "user_agent": {
+                    "description": "<p>String representing the user-agent you want, such as foo/1.0.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_USER_AGENT environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;user_agent&quot;]",
+                    "type": "str"
+                }
+            }],
+            "replicas": ["yes","",[], "", "", "int", [], "The desired number of replicas.",{
+            }],
+            "resource_definition": ["","",[], "", "", "", ["definition","inline"], "Provide a valid YAML definition (either as a string, list, or dict) for an object when creating or updating.<br/>NOTE: <em>kind</em>, <em>api_version</em>, <em>name</em>, and <em>namespace</em> will be overwritten by corresponding values found in the provided <em>resource_definition</em>.",{
+            }],
+            "resource_version": ["","",[], "", "", "str", [], "Only attempt to scale, if the current object version matches.",{
+            }],
+            "src": ["","",[], "", "", "path", [], "Provide a path to a file containing a valid YAML definition of an object or objects to be created or updated. Mutually exclusive with <em>resource_definition</em>. NOTE: <em>kind</em>, <em>api_version</em>, <em>name</em>, and <em>namespace</em> will be overwritten by corresponding values found in the configuration read in from the <em>src</em> file.<br/>Reads from the local file system. To read from the Ansible controller&#x27;s file system, including vaulted files, use the file lookup plugin or template lookup plugin, combined with the from_yaml filter, and pass the result to <em>resource_definition</em>. See Examples below.<br/>Mutually exclusive with <em>template</em> in case of <pre>k8s</pre> module.",{
+            }],
+            "username": ["","",[], "", "", "str", [], "Provide a username for authenticating with the API. Can also be specified via K8S_AUTH_USERNAME environment variable.<br/>Please note that this only works with clusters configured to use HTTP Basic Auth. If your cluster has a different form of authentication (e.g. OAuth2 in OpenShift), this option will not work as expected and you should look into the <pre>community.okd.k8s_auth</pre> module, as that might do what you need.",{
+            }],
+            "validate_certs": ["","",[], "", "", "bool", ["verify_ssl"], "Whether or not to verify the API server&#x27;s SSL certificates. Can also be specified via K8S_AUTH_VERIFY_SSL environment variable.",{
+            }],
+            "wait": ["","",[], "", "True", "bool", [], "For Deployment, ReplicaSet, Replication Controller, wait for the status value of <em>ready_replicas</em> to change to the number of <em>replicas</em>. In the case of a Job, this option is ignored.",{
+            }],
+            "wait_sleep": ["","2.0.0",[], "", "5", "int", [], "Number of seconds to sleep between checks.",{
+            }],
+            "wait_timeout": ["","",[], "", "20", "int", [], "When <code>wait</code> is <em>True</em>, the number of seconds to wait for the <em>ready_replicas</em> status to equal  <em>replicas</em>. If the status is not reached within the allotted time, an error will result. In the case of a Job, this option is ignored.",{
+            }]
+        }
+    }
+}

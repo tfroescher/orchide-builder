@@ -316,6 +316,20 @@ ${module.definitions}
         <echo file="${modules}/collections.json"><![CDATA[[]]></echo>
         <m:log file="${version_logfile}"><![CDATA[# OrchidE definition build from ${timestamp}
 ]]></m:log>
+        <if>
+            <contains string="${module.definitions}" substring="kubernetes"/>
+            <then>
+                <if>
+                    <not>
+                        <contains string="${module.definitions}" substring="community.kubernetes"/>
+                    </not>
+                    <then>
+                        <echo file="${modules}/collections.json" append="yes"><![CDATA[
+    "community.kubernetes",]]></echo>
+                    </then>
+                </if>
+            </then>
+        </if>
         <property name="orchide_only" value="False"/>
         <for param="input-collection" list="${module.definitions}">
             <sequential>
@@ -413,6 +427,7 @@ ${module.definitions}
             </filterchain>
         </loadfile>
         <m:log message="Fixing last line ${fixlastline} json format ..."/>
+
         <replaceregexp file="${modules}/collections.json" replace="${fixlastline},,,,,," match=".*(${fixlastline}).*"
                        byline="yes" flags="gi"/>
         <replaceregexp file="${modules}/collections.json" replace="" match=",,,,,,," byline="yes" flags="gi"/>
@@ -421,18 +436,26 @@ ${module.definitions}
 ]]></echo>
     </target>
     <target name="create-static" description="Copies static definition files for bundling" depends="-config">
-        <copy todir="${references}">
-            <fileset dir="src/main/resources/static/references"/>
+        <copy todir="${references}" overwrite="no" verbose="yes">
+            <fileset dir="src/main/resources/static/references">
+                <include name="**/*"/>
+                <exclude name="module/**/*"/>
+            </fileset>
         </copy>
     </target>
-    <!--
+    <target name="create-static-patches" description="Copies static overwrites of generated definition files" depends="-config" unless="${create-static-patches.disabled}">
+        <copy todir="${references}" overwrite="no" verbose="yes">
+            <fileset dir="src/main/resources/static/references">
+                <include name="module/**/*"/>
+            </fileset>
+        </copy>
+    </target>
     <target name="create-210-package" description="Creates backward compatiblity directory structure">
         <copy todir="${dist}/references/external/module-210">
             <fileset dir="${dist}/references/external/module">
             </fileset>
         </copy>
     </target>
-    -->
     <target name="jar" description="Create final distribution jar with all definitions.">
         <jar destfile="${dist}/orchide-definitions.jar">
             <manifest>
@@ -504,8 +527,9 @@ ${module.definitions}
         <runtarget target="create-definitions"/>
         <runtarget target="patch-freeform"/>
         <runtarget target="create-static"/>
+        <runtarget target="create-static-patches"/>
         <runtarget target="validate-json"/>
-        <!--  <runtarget target="create-210-package"/> -->
+        <runtarget target="create-210-package"/>
         <runtarget target="jar"/>
     </target>
 </project>

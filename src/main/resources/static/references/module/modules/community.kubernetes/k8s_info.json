@@ -1,0 +1,146 @@
+{"k8s_info": {
+        "version": "",
+        "collection_version": "2.1.1",
+        "deprecated": "yes",
+        "removedin": "",
+        "alias": "",
+        "replacedby": "kubernetes.core.k8s_info",
+        "namespace": "community.kubernetes",
+        "categorygroup": "" ,
+        "category": "",
+        "short_description": "Describe Kubernetes (K8s) objects",
+        "returndocs": {
+            "api_found": {
+                "description": "<p>Whether the specified api_version and kind were successfully mapped to an existing API on the targeted cluster.</p><p>Version added 1.2.0.</p>",
+                "full_key": "[&quot;api_found&quot;]",
+                "returned": "always",
+                "type": "bool"
+            },
+            "resources": {
+                "contains": {
+                    "api_version": {
+                        "description": "The versioned schema of this representation of an object.",
+                        "full_key": "[&quot;resources&quot;, &quot;api_version&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "kind": {
+                        "description": "Represents the REST resource this object represents.",
+                        "full_key": "[&quot;resources&quot;, &quot;kind&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "metadata": {
+                        "description": "Standard object metadata. Includes name, namespace, annotations, labels, etc.",
+                        "full_key": "[&quot;resources&quot;, &quot;metadata&quot;]",
+                        "returned": "success",
+                        "type": "dict"
+                    },
+                    "spec": {
+                        "description": "Specific attributes of the object. Will vary based on the <em>api_version</em> and <em>kind</em>.",
+                        "full_key": "[&quot;resources&quot;, &quot;spec&quot;]",
+                        "returned": "success",
+                        "type": "dict"
+                    },
+                    "status": {
+                        "description": "Current status details for the object.",
+                        "full_key": "[&quot;resources&quot;, &quot;status&quot;]",
+                        "returned": "success",
+                        "type": "dict"
+                    }
+                },
+                "description": "<p>The object(s) that exists</p>",
+                "full_key": "[&quot;resources&quot;]",
+                "returned": "success",
+                "type": "complex"
+            }
+        },
+        "description": "Use the Kubernetes Python client to perform read operations on K8s objects.Access to the full range of K8s APIs.Authenticate using either a config file, certificates, password or token.Supports check mode.This module was called <code>k8s_facts</code> before Ansible 2.9. The usage did not change.",
+        "docuri": "k8s-info",
+        "plainexamples": "\n- name: Get an existing Service object\n community.kubernetes.k8s_info:\n    api_version: v1\n    kind: Service\n    name: web\n    namespace: testing\n  register: web_service\n\n- name: Get a list of all service objects\n community.kubernetes.k8s_info:\n    api_version: v1\n    kind: Service\n    namespace: testing\n  register: service_list\n\n- name: Get a list of all pods from any namespace\n community.kubernetes.k8s_info:\n    kind: Pod\n  register: pod_list\n\n- name: Search for all Pods labelled app=web\n community.kubernetes.k8s_info:\n    kind: Pod\n    label_selectors:\n      - app = web\n      - tier in (dev, test)\n\n- name: Using vars while using label_selectors\n community.kubernetes.k8s_info:\n    kind: Pod\n    label_selectors:\n      - &quot;app = {{ app_label_web }}&quot;\n  vars:\n    app_label_web: web\n\n- name: Search for all running pods\n community.kubernetes.k8s_info:\n    kind: Pod\n    field_selectors:\n      - status.phase=Running\n\n- name: List custom objects created using CRD\n community.kubernetes.k8s_info:\n    kind: MyCustomObject\n    api_version: &quot;stable.example.com/v1&quot;\n\n- name: Wait till the Object is created\n community.kubernetes.k8s_info:\n    kind: Pod\n    wait: yes\n    name: pod-not-yet-created\n    namespace: default\n    wait_sleep: 10\n    wait_timeout: 360\n",
+        "metadata": "None",
+        "notes": "<ul><li>To avoid SSL certificate validation errors when <code>validate_certs</code> is <em>True</em>, the full certificate chain for the API server must be provided via <code>ca_cert</code> or in the kubeconfig file.</li></ul>",
+        "requirements": ["python &gt;= 3.6","kubernetes &gt;= 12.0.0","PyYAML &gt;= 3.11"],
+        "authors": "<ul><li>Will Thames (@willthames)</li></ul>",
+        "arguments": {
+            "api_key": ["","",[], "", "", "str", [], "Token used to authenticate with the API. Can also be specified via K8S_AUTH_API_KEY environment variable.",{
+            }],
+            "api_version": ["","",[], "", "v1", "str", ["api","version"], "Use to specify the API version.<br/>Use to create, delete, or discover an object without providing a full resource definition.<br/>Use in conjunction with <em>kind</em>, <em>name</em>, and <em>namespace</em> to identify a specific object.<br/>If <em>resource definition</em> is provided, the <em>apiVersion</em> value from the <em>resource_definition</em> will override this option.",{
+            }],
+            "ca_cert": ["","",[], "", "", "path", ["ssl_ca_cert"], "Path to a CA certificate used to authenticate with the API. The full certificate chain must be provided to avoid certificate validation errors. Can also be specified via K8S_AUTH_SSL_CA_CERT environment variable.",{
+            }],
+            "client_cert": ["","",[], "", "", "path", ["cert_file"], "Path to a certificate used to authenticate with the API. Can also be specified via K8S_AUTH_CERT_FILE environment variable.",{
+            }],
+            "client_key": ["","",[], "", "", "path", ["key_file"], "Path to a key file used to authenticate with the API. Can also be specified via K8S_AUTH_KEY_FILE environment variable.",{
+            }],
+            "context": ["","",[], "", "", "str", [], "The name of a context found in the config file. Can also be specified via K8S_AUTH_CONTEXT environment variable.",{
+            }],
+            "field_selectors": ["","",[], "", "", "list", [], "List of field selectors to use to filter results",{
+            }],
+            "host": ["","",[], "", "", "str", [], "Provide a URL for accessing the API. Can also be specified via K8S_AUTH_HOST environment variable.",{
+            }],
+            "kind": ["yes","",[], "", "", "str", [], "Use to specify an object model.<br/>Use to create, delete, or discover an object without providing a full resource definition.<br/>Use in conjunction with <em>api_version</em>, <em>name</em>, and <em>namespace</em> to identify a specific object.<br/>If <em>resource definition</em> is provided, the <em>kind</em> value from the <em>resource_definition</em> will override this option.",{
+            }],
+            "kubeconfig": ["","",[], "", "", "path", [], "Path to an existing Kubernetes config file. If not provided, and no other connection options are provided, the Kubernetes client will attempt to load the default configuration file from <em>~/.kube/config</em>. Can also be specified via K8S_AUTH_KUBECONFIG environment variable.",{
+            }],
+            "label_selectors": ["","",[], "", "", "list", [], "List of label selectors to use to filter results",{
+            }],
+            "name": ["","",[], "", "", "str", [], "Use to specify an object name.<br/>Use to create, delete, or discover an object without providing a full resource definition.<br/>Use in conjunction with <em>api_version</em>, <em>kind</em> and <em>namespace</em> to identify a specific object.<br/>If <em>resource definition</em> is provided, the <em>metadata.name</em> value from the <em>resource_definition</em> will override this option.",{
+            }],
+            "namespace": ["","",[], "", "", "str", [], "Use to specify an object namespace.<br/>Useful when creating, deleting, or discovering an object without providing a full resource definition.<br/>Use in conjunction with <em>api_version</em>, <em>kind</em>, and <em>name</em> to identify a specific object.<br/>If <em>resource definition</em> is provided, the <em>metadata.namespace</em> value from the <em>resource_definition</em> will override this option.",{
+            }],
+            "password": ["","",[], "", "", "str", [], "Provide a password for authenticating with the API. Can also be specified via K8S_AUTH_PASSWORD environment variable.<br/>Please read the description of the <code>username</code> option for a discussion of when this option is applicable.",{
+            }],
+            "persist_config": ["","",[], "", "", "bool", [], "Whether or not to save the kube config refresh tokens. Can also be specified via K8S_AUTH_PERSIST_CONFIG environment variable.<br/>When the k8s context is using a user credentials with refresh tokens (like oidc or gke/gcloud auth), the token is refreshed by the k8s python client library but not saved by default. So the old refresh token can expire and the next auth might fail. Setting this flag to true will tell the k8s python client to save the new refresh token to the kube config file.<br/>Default to false.<br/>Please note that the current version of the k8s python client library does not support setting this flag to True yet.<br/>The fix for this k8s python library is here: https://github.com/kubernetes-client/python-base/pull/169",{
+            }],
+            "proxy": ["","",[], "", "", "str", [], "The URL of an HTTP proxy to use for the connection. Can also be specified via K8S_AUTH_PROXY environment variable.<br/>Please note that this module does not pick up typical proxy settings from the environment (e.g. HTTP_PROXY).",{
+            }],
+            "proxy_headers": ["","2.0.0",[], "", "", "dict", [], "The Header used for the HTTP proxy.<br/>Documentation can be found here <a href='https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers'>https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers</a>.",{
+                "basic_auth": {
+                    "description": "<p>Colon-separated username:password for basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;basic_auth&quot;]",
+                    "type": "str"
+                },
+                "proxy_basic_auth": {
+                    "description": "<p>Colon-separated username:password for proxy basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_PROXY_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;proxy_basic_auth&quot;]",
+                    "type": "str"
+                },
+                "user_agent": {
+                    "description": "<p>String representing the user-agent you want, such as foo/1.0.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_USER_AGENT environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;user_agent&quot;]",
+                    "type": "str"
+                }
+            }],
+            "username": ["","",[], "", "", "str", [], "Provide a username for authenticating with the API. Can also be specified via K8S_AUTH_USERNAME environment variable.<br/>Please note that this only works with clusters configured to use HTTP Basic Auth. If your cluster has a different form of authentication (e.g. OAuth2 in OpenShift), this option will not work as expected and you should look into the <pre>community.okd.k8s_auth</pre> module, as that might do what you need.",{
+            }],
+            "validate_certs": ["","",[], "", "", "bool", ["verify_ssl"], "Whether or not to verify the API server&#x27;s SSL certificates. Can also be specified via K8S_AUTH_VERIFY_SSL environment variable.",{
+            }],
+            "wait": ["","",[], "", "False", "bool", [], "Whether to wait for certain resource kinds to end up in the desired state.<br/>By default the module exits once Kubernetes has received the request.<br/>Implemented for <code>state=present</code> for <code>Deployment</code>, <code>DaemonSet</code> and <code>Pod</code>, and for <code>state=absent</code> for all resource kinds.<br/>For resource kinds without an implementation, <code>wait</code> returns immediately unless <code>wait_condition</code> is set.",{
+            }],
+            "wait_condition": ["","",[], "", "", "dict", [], "Specifies a custom condition on the status to wait for.<br/>Ignored if <code>wait</code> is not set or is set to False.",{
+                "reason": {
+                    "description": "<p>The value of the reason field in your desired condition</p><p>For example, if a <code>Deployment</code> is paused, The <code>Progressing</code> <code>type</code> will have the <code>DeploymentPaused</code> reason.</p><p>The possible reasons in a condition are specific to each resource type in Kubernetes.</p><p>See the API documentation of the status field for a given resource to see possible choices.</p>",
+                    "full_key": "[&quot;wait_condition&quot;, &quot;reason&quot;]",
+                    "type": "str"
+                },
+                "status": {
+                    "choices": ["True","False","Unknown"],
+                    "default": "True",
+                    "description": "<p>The value of the status field in your desired condition.</p><p>For example, if a <code>Deployment</code> is paused, the <code>Progressing</code> <code>type</code> will have the <code>Unknown</code> status.</p>",
+                    "full_key": "[&quot;wait_condition&quot;, &quot;status&quot;]",
+                    "type": "str"
+                },
+                "type": {
+                    "description": "<p>The type of condition to wait for.</p><p>For example, the <code>Pod</code> resource will set the <code>Ready</code> condition (among others).</p><p>Required if you are specifying a <code>wait_condition</code>.</p><p>If left empty, the <code>wait_condition</code> field will be ignored.</p><p>The possible types for a condition are specific to each resource type in Kubernetes.</p><p>See the API documentation of the status field for a given resource to see possible choices.</p>",
+                    "full_key": "[&quot;wait_condition&quot;, &quot;type&quot;]",
+                    "type": "str"
+                }
+            }],
+            "wait_sleep": ["","",[], "", "5", "int", [], "Number of seconds to sleep between checks.",{
+            }],
+            "wait_timeout": ["","",[], "", "120", "int", [], "How long in seconds to wait for the resource to end up in the desired state.<br/>Ignored if <code>wait</code> is not set.",{
+            }]
+        }
+    }
+}

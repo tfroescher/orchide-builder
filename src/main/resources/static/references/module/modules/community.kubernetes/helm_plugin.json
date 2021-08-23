@@ -1,0 +1,79 @@
+{"helm_plugin": {
+        "version": "1.0.0",
+        "collection_version": "2.1.1",
+        "deprecated": "yes",
+        "removedin": "",
+        "alias": "",
+        "replacedby": "kubernetes.core.helm_plugin",
+        "namespace": "community.kubernetes",
+        "categorygroup": "" ,
+        "category": "",
+        "short_description": "Manage Helm plugins",
+        "returndocs": {
+            "command": {
+                "description": "Full `helm` command built by this module, in case you want to re-run the command outside the module or debug a problem.",
+                "full_key": "[&quot;command&quot;]",
+                "returned": "always",
+                "sample": "&quot;helm plugin list ...&quot;",
+                "type": "str"
+            },
+            "msg": {
+                "description": "Info about successful command",
+                "full_key": "[&quot;msg&quot;]",
+                "returned": "always",
+                "sample": "&quot;Plugin installed successfully&quot;",
+                "type": "str"
+            },
+            "rc": {
+                "description": "Helm plugin command return code",
+                "full_key": "[&quot;rc&quot;]",
+                "returned": "always",
+                "sample": "1",
+                "type": "int"
+            },
+            "stderr": {
+                "description": "Full `helm` command stderr, in case you want to display it or examine the event log",
+                "full_key": "[&quot;stderr&quot;]",
+                "returned": "always",
+                "sample": "&quot;&quot;",
+                "type": "str"
+            },
+            "stdout": {
+                "description": "Full `helm` command stdout, in case you want to display it or examine the event log",
+                "full_key": "[&quot;stdout&quot;]",
+                "returned": "always",
+                "sample": "&quot;&quot;",
+                "type": "str"
+            }
+        },
+        "description": "Manages Helm plugins.",
+        "docuri": "helm-plugin",
+        "plainexamples": "\n- name: Install Helm env plugin\n community.kubernetes.helm_plugin:\n    plugin_path: https://github.com/adamreese/helm-env\n    state: present\n\n- name: Install Helm plugin from local filesystem\n community.kubernetes.helm_plugin:\n    plugin_path: https://domain/path/to/plugin.tar.gz\n    state: present\n\n- name: Remove Helm env plugin\n community.kubernetes.helm_plugin:\n    plugin_name: env\n    state: absent\n",
+        "metadata": "None",
+        "notes": "",
+        "requirements": ["helm (https://github.com/helm/helm/releases)"],
+        "authors": "<ul><li>Abhijeet Kasurde (@Akasurde)</li></ul>",
+        "arguments": {
+            "api_key": ["","1.2.0",[], "", "", "str", [], "Token used to authenticate with the API. Can also be specified via <code>K8S_AUTH_API_KEY</code> environment variable.",{
+            }],
+            "binary_path": ["","",[], "", "", "path", [], "The path of a helm binary to use.",{
+            }],
+            "ca_cert": ["","1.2.0",[], "", "", "path", ["ssl_ca_cert"], "Path to a CA certificate used to authenticate with the API. The full certificate chain must be provided to avoid certificate validation errors. Can also be specified via <code>K8S_AUTH_SSL_CA_CERT</code> environment variable.",{
+            }],
+            "context": ["","",[], "", "", "str", ["kube_context"], "Helm option to specify which kubeconfig context to use.<br/>If the value is not specified in the task, the value of environment variable <code>K8S_AUTH_CONTEXT</code> will be used instead.",{
+            }],
+            "host": ["","1.2.0",[], "", "", "str", [], "Provide a URL for accessing the API. Can also be specified via <code>K8S_AUTH_HOST</code> environment variable.",{
+            }],
+            "kubeconfig": ["","",[], "", "", "path", ["kubeconfig_path"], "Helm option to specify kubeconfig path to use.<br/>If the value is not specified in the task, the value of environment variable <code>K8S_AUTH_KUBECONFIG</code> will be used instead.",{
+            }],
+            "plugin_name": ["","",[], "", "", "str", [], "Name of Helm plugin.<br/>Required only if <code>state=absent</code>.",{
+            }],
+            "plugin_path": ["","",[], "", "", "str", [], "Plugin path to a plugin on your local file system or a url of a remote VCS repo.<br/>If plugin path from file system is provided, make sure that tar is present on remote machine and not on Ansible controller.<br/>Required only if <code>state=present</code>.",{
+            }],
+            "state": ["","",["absent","present"], "present", "", "str", [], "If <code>state=present</code> the Helm plugin will be installed.<br/>If <code>state=absent</code> the Helm plugin will be removed.",{
+            }],
+            "validate_certs": ["","1.2.0",[], "", "True", "bool", ["verify_ssl"], "Whether or not to verify the API server&#x27;s SSL certificates. Can also be specified via <code>K8S_AUTH_VERIFY_SSL</code> environment variable.",{
+            }]
+        }
+    }
+}

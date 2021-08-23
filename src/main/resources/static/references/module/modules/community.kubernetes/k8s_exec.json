@@ -1,0 +1,106 @@
+{"k8s_exec": {
+        "version": "0.10.0",
+        "collection_version": "2.1.1",
+        "deprecated": "yes",
+        "removedin": "",
+        "alias": "",
+        "replacedby": "kubernetes.core.k8s_exec",
+        "namespace": "community.kubernetes",
+        "categorygroup": "" ,
+        "category": "",
+        "short_description": "Execute command in Pod",
+        "returndocs": {
+            "result": {
+                "contains": {
+                    "return_code": {
+                        "description": "The command status code",
+                        "full_key": "[&quot;result&quot;, &quot;return_code&quot;]",
+                        "type": "int"
+                    },
+                    "stderr": {
+                        "description": "The command stderr",
+                        "full_key": "[&quot;result&quot;, &quot;stderr&quot;]",
+                        "type": "str"
+                    },
+                    "stderr_lines": {
+                        "description": "The command stderr",
+                        "full_key": "[&quot;result&quot;, &quot;stderr_lines&quot;]",
+                        "type": "str"
+                    },
+                    "stdout": {
+                        "description": "The command stdout",
+                        "full_key": "[&quot;result&quot;, &quot;stdout&quot;]",
+                        "type": "str"
+                    },
+                    "stdout_lines": {
+                        "description": "The command stdout",
+                        "full_key": "[&quot;result&quot;, &quot;stdout_lines&quot;]",
+                        "type": "str"
+                    }
+                },
+                "description": "<p>The command object</p>",
+                "full_key": "[&quot;result&quot;]",
+                "returned": "success",
+                "type": "complex"
+            }
+        },
+        "description": "Use the Kubernetes Python client to execute command on K8s pods.",
+        "docuri": "k8s-exec",
+        "plainexamples": "\n- name: Execute a command\n community.kubernetes.k8s_exec:\n    namespace: myproject\n    pod: zuul-scheduler\n    command: zuul-scheduler full-reconfigure\n\n- name: Check RC status of command executed\n community.kubernetes.k8s_exec:\n    namespace: myproject\n    pod: busybox-test\n    command: cmd_with_non_zero_exit_code\n  register: command_status\n  ignore_errors: True\n\n- name: Check last command status\n  debug:\n    msg: &quot;cmd failed&quot;\n  when: command_status.return_code != 0\n",
+        "metadata": "None",
+        "notes": "<ul><li>Return code <code>return_code</code> for the command executed is added in output in version 1.0.0.<br/></li><li>The authenticated user must have at least read access to the pods resource and write access to the pods/exec resource.<br/></li><li>To avoid SSL certificate validation errors when <code>validate_certs</code> is <em>True</em>, the full certificate chain for the API server must be provided via <code>ca_cert</code> or in the kubeconfig file.</li></ul>",
+        "requirements": ["python &gt;= 3.6","kubernetes &gt;= 12.0.0","PyYAML &gt;= 3.11"],
+        "authors": "<ul><li>Tristan de Cacqueray (@tristanC)</li></ul>",
+        "arguments": {
+            "api_key": ["","",[], "", "", "str", [], "Token used to authenticate with the API. Can also be specified via K8S_AUTH_API_KEY environment variable.",{
+            }],
+            "ca_cert": ["","",[], "", "", "path", ["ssl_ca_cert"], "Path to a CA certificate used to authenticate with the API. The full certificate chain must be provided to avoid certificate validation errors. Can also be specified via K8S_AUTH_SSL_CA_CERT environment variable.",{
+            }],
+            "client_cert": ["","",[], "", "", "path", ["cert_file"], "Path to a certificate used to authenticate with the API. Can also be specified via K8S_AUTH_CERT_FILE environment variable.",{
+            }],
+            "client_key": ["","",[], "", "", "path", ["key_file"], "Path to a key file used to authenticate with the API. Can also be specified via K8S_AUTH_KEY_FILE environment variable.",{
+            }],
+            "command": ["yes","",[], "", "", "str", [], "The command to execute",{
+            }],
+            "container": ["","",[], "", "", "str", [], "The name of the container in the pod to connect to.<br/>Defaults to only container if there is only one container in the pod.",{
+            }],
+            "context": ["","",[], "", "", "str", [], "The name of a context found in the config file. Can also be specified via K8S_AUTH_CONTEXT environment variable.",{
+            }],
+            "host": ["","",[], "", "", "str", [], "Provide a URL for accessing the API. Can also be specified via K8S_AUTH_HOST environment variable.",{
+            }],
+            "kubeconfig": ["","",[], "", "", "path", [], "Path to an existing Kubernetes config file. If not provided, and no other connection options are provided, the Kubernetes client will attempt to load the default configuration file from <em>~/.kube/config</em>. Can also be specified via K8S_AUTH_KUBECONFIG environment variable.",{
+            }],
+            "namespace": ["yes","",[], "", "", "str", [], "The pod namespace name",{
+            }],
+            "password": ["","",[], "", "", "str", [], "Provide a password for authenticating with the API. Can also be specified via K8S_AUTH_PASSWORD environment variable.<br/>Please read the description of the <code>username</code> option for a discussion of when this option is applicable.",{
+            }],
+            "persist_config": ["","",[], "", "", "bool", [], "Whether or not to save the kube config refresh tokens. Can also be specified via K8S_AUTH_PERSIST_CONFIG environment variable.<br/>When the k8s context is using a user credentials with refresh tokens (like oidc or gke/gcloud auth), the token is refreshed by the k8s python client library but not saved by default. So the old refresh token can expire and the next auth might fail. Setting this flag to true will tell the k8s python client to save the new refresh token to the kube config file.<br/>Default to false.<br/>Please note that the current version of the k8s python client library does not support setting this flag to True yet.<br/>The fix for this k8s python library is here: https://github.com/kubernetes-client/python-base/pull/169",{
+            }],
+            "pod": ["yes","",[], "", "", "str", [], "The pod name",{
+            }],
+            "proxy": ["","",[], "", "", "str", [], "The URL of an HTTP proxy to use for the connection.<br/>Can also be specified via <em>K8S_AUTH_PROXY</em> environment variable.<br/>Please note that this module does not pick up typical proxy settings from the environment (e.g. HTTP_PROXY).",{
+            }],
+            "proxy_headers": ["","2.0.0",[], "", "", "dict", [], "The Header used for the HTTP proxy.<br/>Documentation can be found here <a href='https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers'>https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers</a>.",{
+                "basic_auth": {
+                    "description": "<p>Colon-separated username:password for basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;basic_auth&quot;]",
+                    "type": "str"
+                },
+                "proxy_basic_auth": {
+                    "description": "<p>Colon-separated username:password for proxy basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_PROXY_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;proxy_basic_auth&quot;]",
+                    "type": "str"
+                },
+                "user_agent": {
+                    "description": "<p>String representing the user-agent you want, such as foo/1.0.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_USER_AGENT environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;user_agent&quot;]",
+                    "type": "str"
+                }
+            }],
+            "username": ["","",[], "", "", "str", [], "Provide a username for authenticating with the API. Can also be specified via K8S_AUTH_USERNAME environment variable.<br/>Please note that this only works with clusters configured to use HTTP Basic Auth. If your cluster has a different form of authentication (e.g. OAuth2 in OpenShift), this option will not work as expected and you should look into the <pre>community.okd.k8s_auth</pre> module, as that might do what you need.",{
+            }],
+            "validate_certs": ["","",[], "", "", "bool", ["verify_ssl"], "Whether or not to verify the API server&#x27;s SSL certificates. Can also be specified via K8S_AUTH_VERIFY_SSL environment variable.",{
+            }]
+        }
+    }
+}

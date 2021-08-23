@@ -1,0 +1,152 @@
+{"k8s_json_patch": {
+        "version": "2.0.0",
+        "collection_version": "2.1.1",
+        "deprecated": "yes",
+        "removedin": "",
+        "alias": "",
+        "replacedby": "kubernetes.core.k8s_json_patch",
+        "namespace": "community.kubernetes",
+        "categorygroup": "" ,
+        "category": "",
+        "short_description": "Apply JSON patch operations to existing objects",
+        "returndocs": {
+            "duration": {
+                "description": "Elapsed time of task in seconds.",
+                "full_key": "[&quot;duration&quot;]",
+                "returned": "when <code>wait</code> is true",
+                "sample": "48",
+                "type": "int"
+            },
+            "error": {
+                "description": "The error when patching the object.",
+                "full_key": "[&quot;error&quot;]",
+                "returned": "error",
+                "sample": "{&quot;exception&quot;: &quot;Traceback (most recent call last): ...&quot;, &quot;msg&quot;: &quot;Failed to import the required Python library (jsonpatch) ...&quot;}",
+                "type": "dict"
+            },
+            "result": {
+                "contains": {
+                    "api_version": {
+                        "description": "The versioned schema of this representation of an object.",
+                        "full_key": "[&quot;result&quot;, &quot;api_version&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "kind": {
+                        "description": "The REST resource this object represents.",
+                        "full_key": "[&quot;result&quot;, &quot;kind&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "metadata": {
+                        "description": "Standard object metadata. Includes name, namespace, annotations, labels, etc.",
+                        "full_key": "[&quot;result&quot;, &quot;metadata&quot;]",
+                        "returned": "success",
+                        "type": "dict"
+                    },
+                    "spec": {
+                        "description": "Specific attributes of the object. Will vary based on the <em>api_version</em> and <em>kind</em>.",
+                        "full_key": "[&quot;result&quot;, &quot;spec&quot;]",
+                        "returned": "success",
+                        "type": "dict"
+                    },
+                    "status": {
+                        "description": "Current status details for the object.",
+                        "full_key": "[&quot;result&quot;, &quot;status&quot;]",
+                        "returned": "success",
+                        "type": "dict"
+                    }
+                },
+                "description": "The modified object.",
+                "full_key": "[&quot;result&quot;]",
+                "returned": "success",
+                "type": "dict"
+            }
+        },
+        "description": "This module is used to apply RFC 6902 JSON patch operations only.Use the <pre>k8s</pre> module for strategic merge or JSON merge operations.The jsonpatch library is required for check mode.",
+        "docuri": "k8s-json-patch",
+        "plainexamples": "\n- name: Apply multiple patch operations to an existing Pod\n community.kubernetes.k8s_json_patch:\n    kind: Pod\n    namespace: testing\n    name: mypod\n    patch:\n      - op: add\n        path: /metadata/labels/app\n        value: myapp\n      - op: replace\n        patch: /spec/containers/0/image\n        value: nginx\n",
+        "metadata": "None",
+        "notes": "<ul><li>To avoid SSL certificate validation errors when <code>validate_certs</code> is <em>True</em>, the full certificate chain for the API server must be provided via <code>ca_cert</code> or in the kubeconfig file.</li></ul>",
+        "requirements": ["python &gt;= 3.6","kubernetes &gt;= 12.0.0","PyYAML &gt;= 3.11","jsonpatch"],
+        "authors": "<ul><li>Mike Graves (@gravesm)</li></ul>",
+        "arguments": {
+            "api_key": ["","",[], "", "", "str", [], "Token used to authenticate with the API. Can also be specified via K8S_AUTH_API_KEY environment variable.",{
+            }],
+            "api_version": ["","",[], "", "v1", "str", ["api","version"], "Use to specify the API version.<br/>Use in conjunction with <em>kind</em>, <em>name</em>, and <em>namespace</em> to identify a specific object.",{
+            }],
+            "ca_cert": ["","",[], "", "", "path", ["ssl_ca_cert"], "Path to a CA certificate used to authenticate with the API. The full certificate chain must be provided to avoid certificate validation errors. Can also be specified via K8S_AUTH_SSL_CA_CERT environment variable.",{
+            }],
+            "client_cert": ["","",[], "", "", "path", ["cert_file"], "Path to a certificate used to authenticate with the API. Can also be specified via K8S_AUTH_CERT_FILE environment variable.",{
+            }],
+            "client_key": ["","",[], "", "", "path", ["key_file"], "Path to a key file used to authenticate with the API. Can also be specified via K8S_AUTH_KEY_FILE environment variable.",{
+            }],
+            "context": ["","",[], "", "", "str", [], "The name of a context found in the config file. Can also be specified via K8S_AUTH_CONTEXT environment variable.",{
+            }],
+            "host": ["","",[], "", "", "str", [], "Provide a URL for accessing the API. Can also be specified via K8S_AUTH_HOST environment variable.",{
+            }],
+            "kind": ["yes","",[], "", "", "str", [], "Use to specify an object model.<br/>Use in conjunction with <em>api_version</em>, <em>name</em>, and <em>namespace</em> to identify a specific object.",{
+            }],
+            "kubeconfig": ["","",[], "", "", "path", [], "Path to an existing Kubernetes config file. If not provided, and no other connection options are provided, the Kubernetes client will attempt to load the default configuration file from <em>~/.kube/config</em>. Can also be specified via K8S_AUTH_KUBECONFIG environment variable.",{
+            }],
+            "name": ["yes","",[], "", "", "str", [], "Use to specify an object name.<br/>Use in conjunction with <em>api_version</em>, <em>kind</em>, and <em>namespace</em> to identify a specific object.",{
+            }],
+            "namespace": ["","",[], "", "", "str", [], "Use to specify an object namespace.<br/>Use in conjunction with <em>api_version</em>, <em>kind</em>, and <em>name</em> to identify a specific object.",{
+            }],
+            "password": ["","",[], "", "", "str", [], "Provide a password for authenticating with the API. Can also be specified via K8S_AUTH_PASSWORD environment variable.<br/>Please read the description of the <code>username</code> option for a discussion of when this option is applicable.",{
+            }],
+            "patch": ["yes","",[], "", "", "list", [], "List of JSON patch operations.",{
+            }],
+            "persist_config": ["","",[], "", "", "bool", [], "Whether or not to save the kube config refresh tokens. Can also be specified via K8S_AUTH_PERSIST_CONFIG environment variable.<br/>When the k8s context is using a user credentials with refresh tokens (like oidc or gke/gcloud auth), the token is refreshed by the k8s python client library but not saved by default. So the old refresh token can expire and the next auth might fail. Setting this flag to true will tell the k8s python client to save the new refresh token to the kube config file.<br/>Default to false.<br/>Please note that the current version of the k8s python client library does not support setting this flag to True yet.<br/>The fix for this k8s python library is here: https://github.com/kubernetes-client/python-base/pull/169",{
+            }],
+            "proxy": ["","",[], "", "", "str", [], "The URL of an HTTP proxy to use for the connection. Can also be specified via K8S_AUTH_PROXY environment variable.<br/>Please note that this module does not pick up typical proxy settings from the environment (e.g. HTTP_PROXY).",{
+            }],
+            "proxy_headers": ["","2.0.0",[], "", "", "dict", [], "The Header used for the HTTP proxy.<br/>Documentation can be found here <a href='https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers'>https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers</a>.",{
+                "basic_auth": {
+                    "description": "<p>Colon-separated username:password for basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;basic_auth&quot;]",
+                    "type": "str"
+                },
+                "proxy_basic_auth": {
+                    "description": "<p>Colon-separated username:password for proxy basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_PROXY_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;proxy_basic_auth&quot;]",
+                    "type": "str"
+                },
+                "user_agent": {
+                    "description": "<p>String representing the user-agent you want, such as foo/1.0.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_USER_AGENT environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;user_agent&quot;]",
+                    "type": "str"
+                }
+            }],
+            "username": ["","",[], "", "", "str", [], "Provide a username for authenticating with the API. Can also be specified via K8S_AUTH_USERNAME environment variable.<br/>Please note that this only works with clusters configured to use HTTP Basic Auth. If your cluster has a different form of authentication (e.g. OAuth2 in OpenShift), this option will not work as expected and you should look into the <pre>community.okd.k8s_auth</pre> module, as that might do what you need.",{
+            }],
+            "validate_certs": ["","",[], "", "", "bool", ["verify_ssl"], "Whether or not to verify the API server&#x27;s SSL certificates. Can also be specified via K8S_AUTH_VERIFY_SSL environment variable.",{
+            }],
+            "wait": ["","",[], "", "False", "bool", [], "Whether to wait for certain resource kinds to end up in the desired state.<br/>By default the module exits once Kubernetes has received the request.<br/>Implemented for <code>state=present</code> for <code>Deployment</code>, <code>DaemonSet</code> and <code>Pod</code>, and for <code>state=absent</code> for all resource kinds.<br/>For resource kinds without an implementation, <code>wait</code> returns immediately unless <code>wait_condition</code> is set.",{
+            }],
+            "wait_condition": ["","",[], "", "", "dict", [], "Specifies a custom condition on the status to wait for.<br/>Ignored if <code>wait</code> is not set or is set to False.",{
+                "reason": {
+                    "description": "<p>The value of the reason field in your desired condition</p><p>For example, if a <code>Deployment</code> is paused, The <code>Progressing</code> <code>type</code> will have the <code>DeploymentPaused</code> reason.</p><p>The possible reasons in a condition are specific to each resource type in Kubernetes.</p><p>See the API documentation of the status field for a given resource to see possible choices.</p>",
+                    "full_key": "[&quot;wait_condition&quot;, &quot;reason&quot;]",
+                    "type": "str"
+                },
+                "status": {
+                    "choices": ["True","False","Unknown"],
+                    "default": "True",
+                    "description": "<p>The value of the status field in your desired condition.</p><p>For example, if a <code>Deployment</code> is paused, the <code>Progressing</code> <code>type</code> will have the <code>Unknown</code> status.</p>",
+                    "full_key": "[&quot;wait_condition&quot;, &quot;status&quot;]",
+                    "type": "str"
+                },
+                "type": {
+                    "description": "<p>The type of condition to wait for.</p><p>For example, the <code>Pod</code> resource will set the <code>Ready</code> condition (among others).</p><p>Required if you are specifying a <code>wait_condition</code>.</p><p>If left empty, the <code>wait_condition</code> field will be ignored.</p><p>The possible types for a condition are specific to each resource type in Kubernetes.</p><p>See the API documentation of the status field for a given resource to see possible choices.</p>",
+                    "full_key": "[&quot;wait_condition&quot;, &quot;type&quot;]",
+                    "type": "str"
+                }
+            }],
+            "wait_sleep": ["","",[], "", "5", "int", [], "Number of seconds to sleep between checks.",{
+            }],
+            "wait_timeout": ["","",[], "", "120", "int", [], "How long in seconds to wait for the resource to end up in the desired state.<br/>Ignored if <code>wait</code> is not set.",{
+            }]
+        }
+    }
+}

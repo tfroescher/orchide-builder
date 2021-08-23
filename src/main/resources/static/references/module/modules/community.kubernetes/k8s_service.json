@@ -1,0 +1,125 @@
+{"k8s_service": {
+        "version": "",
+        "collection_version": "2.1.1",
+        "deprecated": "yes",
+        "removedin": "",
+        "alias": "",
+        "replacedby": "kubernetes.core.k8s_service",
+        "namespace": "community.kubernetes",
+        "categorygroup": "" ,
+        "category": "",
+        "short_description": "Manage Services on Kubernetes",
+        "returndocs": {
+            "result": {
+                "contains": {
+                    "api_version": {
+                        "description": "The versioned schema of this representation of an object.",
+                        "full_key": "[&quot;result&quot;, &quot;api_version&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "kind": {
+                        "description": "Always &#x27;Service&#x27;.",
+                        "full_key": "[&quot;result&quot;, &quot;kind&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "metadata": {
+                        "description": "Standard object metadata. Includes name, namespace, annotations, labels, etc.",
+                        "full_key": "[&quot;result&quot;, &quot;metadata&quot;]",
+                        "returned": "success",
+                        "type": "complex"
+                    },
+                    "spec": {
+                        "description": "Specific attributes of the object. Will vary based on the <em>api_version</em> and <em>kind</em>.",
+                        "full_key": "[&quot;result&quot;, &quot;spec&quot;]",
+                        "returned": "success",
+                        "type": "complex"
+                    },
+                    "status": {
+                        "description": "Current status details for the object.",
+                        "full_key": "[&quot;result&quot;, &quot;status&quot;]",
+                        "returned": "success",
+                        "type": "complex"
+                    }
+                },
+                "description": "<p>The created, patched, or otherwise present Service object. Will be empty in the case of a deletion.</p>",
+                "full_key": "[&quot;result&quot;]",
+                "returned": "success",
+                "type": "complex"
+            }
+        },
+        "description": "Use Kubernetes Python SDK to manage Services on Kubernetes",
+        "docuri": "k8s-service",
+        "plainexamples": "\n- name: Expose https port with ClusterIP\n community.kubernetes.k8s_service:\n    state: present\n    name: test-https\n    namespace: default\n    ports:\n    - port: 443\n      protocol: TCP\n    selector:\n      key: special\n\n- name: Expose https port with ClusterIP using spec\n community.kubernetes.k8s_service:\n    state: present\n    name: test-https\n    namespace: default\n    inline:\n      spec:\n        ports:\n        - port: 443\n          protocol: TCP\n        selector:\n          key: special\n",
+        "metadata": "None",
+        "notes": "<ul><li>To avoid SSL certificate validation errors when <code>validate_certs</code> is <em>True</em>, the full certificate chain for the API server must be provided via <code>ca_cert</code> or in the kubeconfig file.</li></ul>",
+        "requirements": ["python &gt;= 3.6","kubernetes &gt;= 12.0.0"],
+        "authors": "<ul><li>KubeVirt Team (@kubevirt)</li></ul>",
+        "arguments": {
+            "api_key": ["","",[], "", "", "str", [], "Token used to authenticate with the API. Can also be specified via K8S_AUTH_API_KEY environment variable.",{
+            }],
+            "apply": ["","",[], "", "False", "bool", [], "<code>apply</code> compares the desired resource definition with the previously supplied resource definition, ignoring properties that are automatically generated<br/><code>apply</code> works better with Services than &#x27;force=yes&#x27;<br/>mutually exclusive with <code>merge_type</code>",{
+            }],
+            "ca_cert": ["","",[], "", "", "path", ["ssl_ca_cert"], "Path to a CA certificate used to authenticate with the API. The full certificate chain must be provided to avoid certificate validation errors. Can also be specified via K8S_AUTH_SSL_CA_CERT environment variable.",{
+            }],
+            "client_cert": ["","",[], "", "", "path", ["cert_file"], "Path to a certificate used to authenticate with the API. Can also be specified via K8S_AUTH_CERT_FILE environment variable.",{
+            }],
+            "client_key": ["","",[], "", "", "path", ["key_file"], "Path to a key file used to authenticate with the API. Can also be specified via K8S_AUTH_KEY_FILE environment variable.",{
+            }],
+            "context": ["","",[], "", "", "str", [], "The name of a context found in the config file. Can also be specified via K8S_AUTH_CONTEXT environment variable.",{
+            }],
+            "force": ["","",[], "", "False", "bool", [], "If set to <code>yes</code>, and <em>state</em> is <code>present</code>, an existing object will be replaced.",{
+            }],
+            "host": ["","",[], "", "", "str", [], "Provide a URL for accessing the API. Can also be specified via K8S_AUTH_HOST environment variable.",{
+            }],
+            "kubeconfig": ["","",[], "", "", "path", [], "Path to an existing Kubernetes config file. If not provided, and no other connection options are provided, the Kubernetes client will attempt to load the default configuration file from <em>~/.kube/config</em>. Can also be specified via K8S_AUTH_KUBECONFIG environment variable.",{
+            }],
+            "merge_type": ["","",["json","merge","strategic-merge"], "", "", "list", [], "Whether to override the default patch merge approach with a specific type. By default, the strategic merge will typically be used.<br/>For example, Custom Resource Definitions typically aren&#x27;t updatable by the usual strategic merge. You may want to use <code>merge</code> if you see &quot;strategic merge patch format is not supported&quot;<br/>See <a href='https://kubernetes.io/docs/tasks/run-application/update-api-object-kubectl-patch/#use-a-json-merge-patch-to-update-a-deployment'>https://kubernetes.io/docs/tasks/run-application/update-api-object-kubectl-patch/#use-a-json-merge-patch-to-update-a-deployment</a><br/>If more than one <code>merge_type</code> is given, the merge_types will be tried in order<br/>This defaults to <code>[&#x27;strategic-merge&#x27;, &#x27;merge&#x27;]</code>, which is ideal for using the same parameters on resource kinds that combine Custom Resources and built-in resources.",{
+            }],
+            "name": ["yes","",[], "", "", "str", [], "Use to specify a Service object name.",{
+            }],
+            "namespace": ["yes","",[], "", "", "str", [], "Use to specify a Service object namespace.",{
+            }],
+            "password": ["","",[], "", "", "str", [], "Provide a password for authenticating with the API. Can also be specified via K8S_AUTH_PASSWORD environment variable.<br/>Please read the description of the <code>username</code> option for a discussion of when this option is applicable.",{
+            }],
+            "persist_config": ["","",[], "", "", "bool", [], "Whether or not to save the kube config refresh tokens. Can also be specified via K8S_AUTH_PERSIST_CONFIG environment variable.<br/>When the k8s context is using a user credentials with refresh tokens (like oidc or gke/gcloud auth), the token is refreshed by the k8s python client library but not saved by default. So the old refresh token can expire and the next auth might fail. Setting this flag to true will tell the k8s python client to save the new refresh token to the kube config file.<br/>Default to false.<br/>Please note that the current version of the k8s python client library does not support setting this flag to True yet.<br/>The fix for this k8s python library is here: https://github.com/kubernetes-client/python-base/pull/169",{
+            }],
+            "ports": ["","",[], "", "", "list", [], "A list of ports to expose.<br/><a href='https://kubernetes.io/docs/concepts/services-networking/service/#multi-port-services'>https://kubernetes.io/docs/concepts/services-networking/service/#multi-port-services</a>",{
+            }],
+            "proxy": ["","",[], "", "", "str", [], "The URL of an HTTP proxy to use for the connection. Can also be specified via K8S_AUTH_PROXY environment variable.<br/>Please note that this module does not pick up typical proxy settings from the environment (e.g. HTTP_PROXY).",{
+            }],
+            "proxy_headers": ["","2.0.0",[], "", "", "dict", [], "The Header used for the HTTP proxy.<br/>Documentation can be found here <a href='https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers'>https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers</a>.",{
+                "basic_auth": {
+                    "description": "<p>Colon-separated username:password for basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;basic_auth&quot;]",
+                    "type": "str"
+                },
+                "proxy_basic_auth": {
+                    "description": "<p>Colon-separated username:password for proxy basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_PROXY_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;proxy_basic_auth&quot;]",
+                    "type": "str"
+                },
+                "user_agent": {
+                    "description": "<p>String representing the user-agent you want, such as foo/1.0.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_USER_AGENT environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;user_agent&quot;]",
+                    "type": "str"
+                }
+            }],
+            "resource_definition": ["","",[], "", "", "", ["definition","inline"], "Provide a valid YAML definition (either as a string, list, or dict) for an object when creating or updating.<br/>NOTE: <em>kind</em>, <em>api_version</em>, <em>name</em>, and <em>namespace</em> will be overwritten by corresponding values found in the provided <em>resource_definition</em>.",{
+            }],
+            "selector": ["","",[], "", "", "dict", [], "Label selectors identify objects this Service should apply to.<br/><a href='https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/'>https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/</a>",{
+            }],
+            "src": ["","",[], "", "", "path", [], "Provide a path to a file containing a valid YAML definition of an object or objects to be created or updated. Mutually exclusive with <em>resource_definition</em>. NOTE: <em>kind</em>, <em>api_version</em>, <em>name</em>, and <em>namespace</em> will be overwritten by corresponding values found in the configuration read in from the <em>src</em> file.<br/>Reads from the local file system. To read from the Ansible controller&#x27;s file system, including vaulted files, use the file lookup plugin or template lookup plugin, combined with the from_yaml filter, and pass the result to <em>resource_definition</em>. See Examples below.<br/>Mutually exclusive with <em>template</em> in case of <pre>k8s</pre> module.",{
+            }],
+            "state": ["","",["absent","present"], "present", "", "str", [], "Determines if an object should be created, patched, or deleted. When set to <code>present</code>, an object will be created, if it does not already exist. If set to <code>absent</code>, an existing object will be deleted. If set to <code>present</code>, an existing object will be patched, if its attributes differ from those specified using <em>resource_definition</em> or <em>src</em>.",{
+            }],
+            "type": ["","",["NodePort","ClusterIP","LoadBalancer","ExternalName"], "", "", "str", [], "Specifies the type of Service to create.<br/>See <a href='https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types'>https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types</a>",{
+            }],
+            "username": ["","",[], "", "", "str", [], "Provide a username for authenticating with the API. Can also be specified via K8S_AUTH_USERNAME environment variable.<br/>Please note that this only works with clusters configured to use HTTP Basic Auth. If your cluster has a different form of authentication (e.g. OAuth2 in OpenShift), this option will not work as expected and you should look into the <pre>community.okd.k8s_auth</pre> module, as that might do what you need.",{
+            }],
+            "validate_certs": ["","",[], "", "", "bool", ["verify_ssl"], "Whether or not to verify the API server&#x27;s SSL certificates. Can also be specified via K8S_AUTH_VERIFY_SSL environment variable.",{
+            }]
+        }
+    }
+}

@@ -1,0 +1,63 @@
+{"helm_template": {
+        "version": "",
+        "collection_version": "2.1.1",
+        "deprecated": "yes",
+        "removedin": "",
+        "alias": "",
+        "replacedby": "kubernetes.core.helm_template",
+        "namespace": "community.kubernetes",
+        "categorygroup": "" ,
+        "category": "",
+        "short_description": "Render chart templates",
+        "returndocs": {
+            "command": {
+                "description": "Full <code>helm</code> command run by this module, in case you want to re-run the command outside the module or debug a problem.",
+                "full_key": "[&quot;command&quot;]",
+                "returned": "always",
+                "sample": "&quot;helm template --output-dir mychart nginx-stable/nginx-ingress&quot;",
+                "type": "str"
+            },
+            "stderr": {
+                "description": "Full <code>helm</code> command stderr, in case you want to display it or examine the event log.",
+                "full_key": "[&quot;stderr&quot;]",
+                "returned": "always",
+                "sample": "&quot;&quot;",
+                "type": "str"
+            },
+            "stdout": {
+                "description": "Full <code>helm</code> command stdout. If no <em>output_dir</em> has been provided this will contain the rendered templates as concatenated yaml documents.",
+                "full_key": "[&quot;stdout&quot;]",
+                "returned": "always",
+                "sample": "&quot;&quot;",
+                "type": "str"
+            }
+        },
+        "description": "Render chart templates to an output directory or as text of concatenated yaml documents.",
+        "docuri": "helm-template",
+        "plainexamples": "\n- name: Render templates to specified directory\n community.kubernetes.helm_template:\n    chart_ref: stable/prometheus\n    output_dir: mycharts\n\n- name: Render templates\n community.kubernetes.helm_template:\n    chart_ref: stable/prometheus\n  register: result\n\n- name: Write templates to file\n  copy:\n    dest: myfile.yaml\n    content: &quot;{{ result.stdout }}&quot;\n",
+        "metadata": "None",
+        "notes": "",
+        "requirements": [],
+        "authors": "<ul><li>Mike Graves (@gravesm)</li></ul>",
+        "arguments": {
+            "binary_path": ["","",[], "", "", "path", [], "The path of a helm binary to use.",{
+            }],
+            "chart_ref": ["yes","",[], "", "", "path", [], "Chart reference with repo prefix, for example, <code>nginx-stable/nginx-ingress</code>.<br/>Path to a packaged chart.<br/>Path to an unpacked chart directory.<br/>Absolute URL.",{
+            }],
+            "chart_repo_url": ["","",[], "", "", "str", [], "Chart repository URL where the requested chart is located.",{
+            }],
+            "chart_version": ["","",[], "", "", "str", [], "Chart version to use. If this is not specified, the latest version is installed.",{
+            }],
+            "include_crds": ["","",[], "", "False", "bool", [], "Include custom resource descriptions in rendered templates.",{
+            }],
+            "output_dir": ["","",[], "", "", "path", [], "Output directory where templates will be written.<br/>If the directory already exists, it will be overwritten.",{
+            }],
+            "release_values": ["","",[], "", "{}", "dict", ["values"], "Values to pass to chart.",{
+            }],
+            "update_repo_cache": ["","",[], "", "False", "bool", [], "Run <code>helm repo update</code> before the operation. Can be run as part of the template generation or as a separate step.",{
+            }],
+            "values_files": ["","",[], "", "[]", "list", [], "Value files to pass to chart.<br/>Paths will be read from the target host&#x27;s filesystem, not the host running ansible.<br/><em>values_files</em> option is evaluated before <em>values</em> option if both are used.<br/>Paths are evaluated in the order the paths are specified.",{
+            }]
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "MOD_allmodules": {
+        "general": [
+            { "name": "helm", "deprecated": "yes" },
+            { "name": "helm_info", "deprecated": "yes" },            
+            { "name": "helm_plugin", "deprecated": "yes" },            
+            { "name": "helm_plugin_info", "deprecated": "yes" },            
+            { "name": "helm_repository", "deprecated": "yes" },            
+            { "name": "helm_template", "deprecated": "yes" },            
+            { "name": "k8s", "deprecated": "yes" },            
+            { "name": "k8s_cluster_info", "deprecated": "yes" },            
+            { "name": "k8s_exec", "deprecated": "yes" },            
+            { "name": "k8s_info", "deprecated": "yes" },            
+            { "name": "k8s_json_patch", "deprecated": "yes" },            
+            { "name": "k8s_log", "deprecated": "yes" },            
+            { "name": "k8s_rollback", "deprecated": "yes" },            
+            { "name": "k8s_scale", "deprecated": "yes" },            
+            { "name": "k8s_service", "deprecated": "yes" }            
+        ]        
+    }
+}

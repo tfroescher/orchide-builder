@@ -1,0 +1,78 @@
+{"helm_repository": {
+        "version": "0.11.0",
+        "collection_version": "2.1.1",
+        "deprecated": "yes",
+        "removedin": "",
+        "alias": "",
+        "replacedby": "kubernetes.core.helm_repository",
+        "namespace": "community.kubernetes",
+        "categorygroup": "" ,
+        "category": "",
+        "short_description": "Manage Helm repositories",
+        "returndocs": {
+            "command": {
+                "description": "Full `helm` command built by this module, in case you want to re-run the command outside the module or debug a problem.",
+                "full_key": "[&quot;command&quot;]",
+                "returned": "always",
+                "sample": "&quot;/usr/local/bin/helm repo add bitnami https://charts.bitnami.com/bitnami&quot;",
+                "type": "str"
+            },
+            "msg": {
+                "description": "Error message returned by `helm` command",
+                "full_key": "[&quot;msg&quot;]",
+                "returned": "on failure",
+                "sample": "&quot;Repository already have a repository named bitnami&quot;",
+                "type": "str"
+            },
+            "stderr": {
+                "description": "Full `helm` command stderr, in case you want to display it or examine the event log",
+                "full_key": "[&quot;stderr&quot;]",
+                "returned": "always",
+                "sample": "&quot;&quot;",
+                "type": "str"
+            },
+            "stderr_lines": {
+                "description": "Full `helm` command stderr in list, in case you want to display it or examine the event log",
+                "full_key": "[&quot;stderr_lines&quot;]",
+                "returned": "always",
+                "sample": "[&quot;&quot;]",
+                "type": "list"
+            },
+            "stdout": {
+                "description": "Full `helm` command stdout, in case you want to display it or examine the event log",
+                "full_key": "[&quot;stdout&quot;]",
+                "returned": "always",
+                "sample": "&quot;\\&quot;bitnami\\&quot; has been added to your repositories&quot;",
+                "type": "str"
+            },
+            "stdout_lines": {
+                "description": "Full `helm` command stdout in list, in case you want to display it or examine the event log",
+                "full_key": "[&quot;stdout_lines&quot;]",
+                "returned": "always",
+                "sample": "[&quot;\\&quot;bitnami\\&quot; has been added to your repositories&quot;]",
+                "type": "list"
+            }
+        },
+        "description": "Manage Helm repositories.",
+        "docuri": "helm-repository",
+        "plainexamples": "\n- name: Add a repository\n community.kubernetes.helm_repository:\n    name: stable\n    repo_url: https://kubernetes.github.io/ingress-nginx\n\n- name: Add Red Hat Helm charts repository\n community.kubernetes.helm_repository:\n    name: redhat-charts\n    repo_url: https://redhat-developer.github.com/redhat-helm-charts\n",
+        "metadata": "None",
+        "notes": "",
+        "requirements": ["helm (https://github.com/helm/helm/releases)","yaml (https://pypi.org/project/PyYAML/)"],
+        "authors": "<ul><li>Lucas Boisserie (@LucasBoisserie)</li></ul>",
+        "arguments": {
+            "binary_path": ["","",[], "", "", "path", [], "The path of a helm binary to use.",{
+            }],
+            "repo_name": ["yes","",[], "", "", "str", ["name"], "Chart repository name.",{
+            }],
+            "repo_password": ["","",[], "", "", "str", ["password"], "Chart repository password for repository with basic auth.<br/>Required if chart_repo_username is specified.",{
+            }],
+            "repo_state": ["","",["present","absent"], "present", "", "str", ["state"], "Desired state of repository.",{
+            }],
+            "repo_url": ["","",[], "", "", "str", ["url"], "Chart repository url",{
+            }],
+            "repo_username": ["","",[], "", "", "str", ["username"], "Chart repository username for repository with basic auth.<br/>Required if chart_repo_password is specified.",{
+            }]
+        }
+    }
+}

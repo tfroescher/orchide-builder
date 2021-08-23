@@ -1,0 +1,182 @@
+{"k8s_cluster_info": {
+        "version": "0.11.1",
+        "collection_version": "2.1.1",
+        "deprecated": "yes",
+        "removedin": "",
+        "alias": "",
+        "replacedby": "kubernetes.core.k8s_cluster_info",
+        "namespace": "community.kubernetes",
+        "categorygroup": "" ,
+        "category": "",
+        "short_description": "Describe Kubernetes (K8s) cluster, APIs available and their respective versions",
+        "returndocs": {
+            "apis": {
+                "contains": {
+                    "categories": {
+                        "description": "API categories",
+                        "full_key": "[&quot;apis&quot;, &quot;categories&quot;]",
+                        "returned": "success",
+                        "type": "list"
+                    },
+                    "name": {
+                        "description": "Resource short name",
+                        "full_key": "[&quot;apis&quot;, &quot;name&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "namespaced": {
+                        "description": "If resource is namespaced",
+                        "full_key": "[&quot;apis&quot;, &quot;namespaced&quot;]",
+                        "returned": "success",
+                        "type": "bool"
+                    },
+                    "preferred": {
+                        "description": "If resource version preferred",
+                        "full_key": "[&quot;apis&quot;, &quot;preferred&quot;]",
+                        "returned": "success",
+                        "type": "bool"
+                    },
+                    "short_names": {
+                        "description": "Resource short names",
+                        "full_key": "[&quot;apis&quot;, &quot;short_names&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "singular_name": {
+                        "description": "Resource singular name",
+                        "full_key": "[&quot;apis&quot;, &quot;singular_name&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    }
+                },
+                "description": "<p>dictionary of group + version of resource found from cluster</p>",
+                "elements": "dict",
+                "full_key": "[&quot;apis&quot;]",
+                "returned": "success",
+                "type": "dict"
+            },
+            "connection": {
+                "contains": {
+                    "cert_file": {
+                        "description": "<p>Path to client certificate.</p>",
+                        "full_key": "[&quot;connection&quot;, &quot;cert_file&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "host": {
+                        "description": "<p>Host URL</p>",
+                        "full_key": "[&quot;connection&quot;, &quot;host&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "password": {
+                        "description": "<p>User password</p>",
+                        "full_key": "[&quot;connection&quot;, &quot;password&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "proxy": {
+                        "description": "<p>Proxy details</p>",
+                        "full_key": "[&quot;connection&quot;, &quot;proxy&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "ssl_ca_cert": {
+                        "description": "<p>Path to CA certificate</p>",
+                        "full_key": "[&quot;connection&quot;, &quot;ssl_ca_cert&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "username": {
+                        "description": "<p>Username</p>",
+                        "full_key": "[&quot;connection&quot;, &quot;username&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "verify_ssl": {
+                        "description": "<p>SSL verification status</p>",
+                        "full_key": "[&quot;connection&quot;, &quot;verify_ssl&quot;]",
+                        "returned": "success",
+                        "type": "bool"
+                    }
+                },
+                "description": "<p>Connection information</p>",
+                "full_key": "[&quot;connection&quot;]",
+                "returned": "success",
+                "type": "dict"
+            },
+            "version": {
+                "contains": {
+                    "client": {
+                        "description": "Client version",
+                        "full_key": "[&quot;version&quot;, &quot;client&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "server": {
+                        "description": "Server version",
+                        "full_key": "[&quot;version&quot;, &quot;server&quot;]",
+                        "returned": "success",
+                        "type": "dict"
+                    }
+                },
+                "description": "<p>Information about server and client version</p>",
+                "full_key": "[&quot;version&quot;]",
+                "returned": "success",
+                "type": "dict"
+            }
+        },
+        "description": "Use the Kubernetes Python client to perform read operations on K8s objects.Authenticate using either a config file, certificates, password or token.Supports check mode.",
+        "docuri": "k8s-cluster-info",
+        "plainexamples": "\n- name: Get Cluster information\n community.kubernetes.k8s_cluster_info:\n  register: api_status\n\n- name: Do not invalidate cache before getting information\n community.kubernetes.k8s_cluster_info:\n    invalidate_cache: False\n  register: api_status\n",
+        "metadata": "None",
+        "notes": "<ul><li>To avoid SSL certificate validation errors when <code>validate_certs</code> is <em>True</em>, the full certificate chain for the API server must be provided via <code>ca_cert</code> or in the kubeconfig file.</li></ul>",
+        "requirements": ["python &gt;= 3.6","kubernetes &gt;= 12.0.0","PyYAML &gt;= 3.11"],
+        "authors": "<ul><li>Abhijeet Kasurde (@Akasurde)</li></ul>",
+        "arguments": {
+            "api_key": ["","",[], "", "", "str", [], "Token used to authenticate with the API. Can also be specified via K8S_AUTH_API_KEY environment variable.",{
+            }],
+            "ca_cert": ["","",[], "", "", "path", ["ssl_ca_cert"], "Path to a CA certificate used to authenticate with the API. The full certificate chain must be provided to avoid certificate validation errors. Can also be specified via K8S_AUTH_SSL_CA_CERT environment variable.",{
+            }],
+            "client_cert": ["","",[], "", "", "path", ["cert_file"], "Path to a certificate used to authenticate with the API. Can also be specified via K8S_AUTH_CERT_FILE environment variable.",{
+            }],
+            "client_key": ["","",[], "", "", "path", ["key_file"], "Path to a key file used to authenticate with the API. Can also be specified via K8S_AUTH_KEY_FILE environment variable.",{
+            }],
+            "context": ["","",[], "", "", "str", [], "The name of a context found in the config file. Can also be specified via K8S_AUTH_CONTEXT environment variable.",{
+            }],
+            "host": ["","",[], "", "", "str", [], "Provide a URL for accessing the API. Can also be specified via K8S_AUTH_HOST environment variable.",{
+            }],
+            "invalidate_cache": ["","",[], "", "True", "bool", [], "Invalidate cache before retrieving information about cluster.",{
+            }],
+            "kubeconfig": ["","",[], "", "", "path", [], "Path to an existing Kubernetes config file. If not provided, and no other connection options are provided, the Kubernetes client will attempt to load the default configuration file from <em>~/.kube/config</em>. Can also be specified via K8S_AUTH_KUBECONFIG environment variable.",{
+            }],
+            "password": ["","",[], "", "", "str", [], "Provide a password for authenticating with the API. Can also be specified via K8S_AUTH_PASSWORD environment variable.<br/>Please read the description of the <code>username</code> option for a discussion of when this option is applicable.",{
+            }],
+            "persist_config": ["","",[], "", "", "bool", [], "Whether or not to save the kube config refresh tokens. Can also be specified via K8S_AUTH_PERSIST_CONFIG environment variable.<br/>When the k8s context is using a user credentials with refresh tokens (like oidc or gke/gcloud auth), the token is refreshed by the k8s python client library but not saved by default. So the old refresh token can expire and the next auth might fail. Setting this flag to true will tell the k8s python client to save the new refresh token to the kube config file.<br/>Default to false.<br/>Please note that the current version of the k8s python client library does not support setting this flag to True yet.<br/>The fix for this k8s python library is here: https://github.com/kubernetes-client/python-base/pull/169",{
+            }],
+            "proxy": ["","",[], "", "", "str", [], "The URL of an HTTP proxy to use for the connection. Can also be specified via K8S_AUTH_PROXY environment variable.<br/>Please note that this module does not pick up typical proxy settings from the environment (e.g. HTTP_PROXY).",{
+            }],
+            "proxy_headers": ["","2.0.0",[], "", "", "dict", [], "The Header used for the HTTP proxy.<br/>Documentation can be found here <a href='https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers'>https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers</a>.",{
+                "basic_auth": {
+                    "description": "<p>Colon-separated username:password for basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;basic_auth&quot;]",
+                    "type": "str"
+                },
+                "proxy_basic_auth": {
+                    "description": "<p>Colon-separated username:password for proxy basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_PROXY_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;proxy_basic_auth&quot;]",
+                    "type": "str"
+                },
+                "user_agent": {
+                    "description": "<p>String representing the user-agent you want, such as foo/1.0.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_USER_AGENT environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;user_agent&quot;]",
+                    "type": "str"
+                }
+            }],
+            "username": ["","",[], "", "", "str", [], "Provide a username for authenticating with the API. Can also be specified via K8S_AUTH_USERNAME environment variable.<br/>Please note that this only works with clusters configured to use HTTP Basic Auth. If your cluster has a different form of authentication (e.g. OAuth2 in OpenShift), this option will not work as expected and you should look into the <pre>community.okd.k8s_auth</pre> module, as that might do what you need.",{
+            }],
+            "validate_certs": ["","",[], "", "", "bool", ["verify_ssl"], "Whether or not to verify the API server&#x27;s SSL certificates. Can also be specified via K8S_AUTH_VERIFY_SSL environment variable.",{
+            }]
+        }
+    }
+}

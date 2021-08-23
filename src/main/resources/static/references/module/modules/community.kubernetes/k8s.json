@@ -1,0 +1,221 @@
+{"k8s": {
+        "version": "",
+        "collection_version": "2.1.1",
+        "deprecated": "yes",
+        "removedin": "",
+        "alias": "",
+        "replacedby": "kubernetes.core.k8s",
+        "namespace": "community.kubernetes",
+        "categorygroup": "" ,
+        "category": "",
+        "short_description": "Manage Kubernetes (K8s) objects",
+        "returndocs": {
+            "result": {
+                "contains": {
+                    "api_version": {
+                        "description": "The versioned schema of this representation of an object.",
+                        "full_key": "[&quot;result&quot;, &quot;api_version&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "duration": {
+                        "description": "elapsed time of task in seconds",
+                        "full_key": "[&quot;result&quot;, &quot;duration&quot;]",
+                        "returned": "when <code>wait</code> is true",
+                        "sample": "48",
+                        "type": "int"
+                    },
+                    "error": {
+                        "description": "error while trying to create/delete the object.",
+                        "full_key": "[&quot;result&quot;, &quot;error&quot;]",
+                        "returned": "error",
+                        "type": "complex"
+                    },
+                    "items": {
+                        "description": "Returned only when multiple yaml documents are passed to src or resource_definition",
+                        "full_key": "[&quot;result&quot;, &quot;items&quot;]",
+                        "returned": "when resource_definition or src contains list of objects",
+                        "type": "list"
+                    },
+                    "kind": {
+                        "description": "Represents the REST resource this object represents.",
+                        "full_key": "[&quot;result&quot;, &quot;kind&quot;]",
+                        "returned": "success",
+                        "type": "str"
+                    },
+                    "metadata": {
+                        "description": "Standard object metadata. Includes name, namespace, annotations, labels, etc.",
+                        "full_key": "[&quot;result&quot;, &quot;metadata&quot;]",
+                        "returned": "success",
+                        "type": "complex"
+                    },
+                    "spec": {
+                        "description": "Specific attributes of the object. Will vary based on the <em>api_version</em> and <em>kind</em>.",
+                        "full_key": "[&quot;result&quot;, &quot;spec&quot;]",
+                        "returned": "success",
+                        "type": "complex"
+                    },
+                    "status": {
+                        "description": "Current status details for the object.",
+                        "full_key": "[&quot;result&quot;, &quot;status&quot;]",
+                        "returned": "success",
+                        "type": "complex"
+                    }
+                },
+                "description": "<p>The created, patched, or otherwise present object. Will be empty in the case of a deletion.</p>",
+                "full_key": "[&quot;result&quot;]",
+                "returned": "success",
+                "type": "complex"
+            }
+        },
+        "description": "Use the Kubernetes Python client to perform CRUD operations on K8s objects.Pass the object definition from a source file or inline. See examples for reading files and using Jinja templates or vault-encrypted files.Access to the full range of K8s APIs.Use the <pre>community.kubernetes.k8s_info</pre> module to obtain a list of items about an object of type <code>kind</code>Authenticate using either a config file, certificates, password or token.Supports check mode.",
+        "docuri": "k8s",
+        "plainexamples": "\n- name: Create a k8s namespace\n community.kubernetes.k8s:\n    name: testing\n    api_version: v1\n    kind: Namespace\n    state: present\n\n- name: Create a Service object from an inline definition\n community.kubernetes.k8s:\n    state: present\n    definition:\n      apiVersion: v1\n      kind: Service\n      metadata:\n        name: web\n        namespace: testing\n        labels:\n          app: galaxy\n          service: web\n      spec:\n        selector:\n          app: galaxy\n          service: web\n        ports:\n        - protocol: TCP\n          targetPort: 8000\n          name: port-8000-tcp\n          port: 8000\n\n- name: Remove an existing Service object\n community.kubernetes.k8s:\n    state: absent\n    api_version: v1\n    kind: Service\n    namespace: testing\n    name: web\n\n# Passing the object definition from a file\n\n- name: Create a Deployment by reading the definition from a local file\n community.kubernetes.k8s:\n    state: present\n    src: /testing/deployment.yml\n\n- name: &gt;-\n    Read definition file from the Ansible controller file system.\n    If the definition file has been encrypted with Ansible Vault it will automatically be decrypted.\n community.kubernetes.k8s:\n    state: present\n    definition: &quot;{{ lookup(&#x27;file&#x27;, &#x27;/testing/deployment.yml&#x27;) | from_yaml }}&quot;\n\n- name: Read definition template file from the Ansible controller file system\n community.kubernetes.k8s:\n    state: present\n    template: &#x27;/testing/deployment.j2&#x27;\n\n- name: Read definition template file from the Ansible controller file system that uses custom start/end strings\n community.kubernetes.k8s:\n    state: present\n    template:\n      path: &#x27;/testing/deployment.j2&#x27;\n      variable_start_string: &#x27;[[&#x27;\n      variable_end_string: &#x27;]]&#x27;\n\n- name: fail on validation errors\n community.kubernetes.k8s:\n    state: present\n    definition: &quot;{{ lookup(&#x27;template&#x27;, &#x27;/testing/deployment.yml&#x27;) | from_yaml }}&quot;\n    validate:\n      fail_on_error: yes\n\n- name: warn on validation errors, check for unexpected properties\n community.kubernetes.k8s:\n    state: present\n    definition: &quot;{{ lookup(&#x27;template&#x27;, &#x27;/testing/deployment.yml&#x27;) | from_yaml }}&quot;\n    validate:\n      fail_on_error: no\n      strict: yes\n\n# Download and apply manifest\n- name: Download metrics-server manifest to the cluster.\n  ansible.builtin.get_url:\n    url: https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml\n    dest: ~/metrics-server.yaml\n    mode: &#x27;0664&#x27;\n\n- name: Apply metrics-server manifest to the cluster.\n community.kubernetes.k8s:\n    state: present\n    src: ~/metrics-server.yaml\n\n# Wait for a Deployment to pause before continuing\n- name: Pause a Deployment.\n community.kubernetes.k8s:\n    definition:\n      apiVersion: apps/v1\n      kind: Deployment\n      metadata:\n        name: example\n        namespace: testing\n      spec:\n        paused: True\n    wait: yes\n    wait_condition:\n      type: Progressing\n      status: Unknown\n      reason: DeploymentPaused\n\n# Patch existing namespace : add label\n- name: add label to existing namespace\n community.kubernetes.k8s:\n    state: patched\n    kind: Namespace\n    name: patch_namespace\n    definition:\n      metadata:\n        labels:\n          support: patch\n",
+        "metadata": "None",
+        "notes": "<ul><li>To avoid SSL certificate validation errors when <code>validate_certs</code> is <em>True</em>, the full certificate chain for the API server must be provided via <code>ca_cert</code> or in the kubeconfig file.</li></ul>",
+        "requirements": ["python &gt;= 3.6","kubernetes &gt;= 12.0.0","PyYAML &gt;= 3.11","jsonpatch"],
+        "authors": "<ul><li>Chris Houseknecht (@chouseknecht)<br/></li><li>Fabian von Feilitzsch (@fabianvf)</li></ul>",
+        "arguments": {
+            "api_key": ["","",[], "", "", "str", [], "Token used to authenticate with the API. Can also be specified via K8S_AUTH_API_KEY environment variable.",{
+            }],
+            "api_version": ["","",[], "", "v1", "str", ["api","version"], "Use to specify the API version.<br/>Use to create, delete, or discover an object without providing a full resource definition.<br/>Use in conjunction with <em>kind</em>, <em>name</em>, and <em>namespace</em> to identify a specific object.<br/>If <em>resource definition</em> is provided, the <em>apiVersion</em> value from the <em>resource_definition</em> will override this option.",{
+            }],
+            "append_hash": ["","",[], "", "False", "bool", [], "Whether to append a hash to a resource name for immutability purposes<br/>Applies only to ConfigMap and Secret resources<br/>The parameter will be silently ignored for other resource kinds<br/>The full definition of an object is needed to generate the hash - this means that deleting an object created with append_hash will only work if the same object is passed with state=absent (alternatively, just use state=absent with the name including the generated hash and append_hash=no)",{
+            }],
+            "apply": ["","",[], "", "False", "bool", [], "<code>apply</code> compares the desired resource definition with the previously supplied resource definition, ignoring properties that are automatically generated<br/><code>apply</code> works better with Services than &#x27;force=yes&#x27;<br/>mutually exclusive with <code>merge_type</code>",{
+            }],
+            "ca_cert": ["","",[], "", "", "path", ["ssl_ca_cert"], "Path to a CA certificate used to authenticate with the API. The full certificate chain must be provided to avoid certificate validation errors. Can also be specified via K8S_AUTH_SSL_CA_CERT environment variable.",{
+            }],
+            "client_cert": ["","",[], "", "", "path", ["cert_file"], "Path to a certificate used to authenticate with the API. Can also be specified via K8S_AUTH_CERT_FILE environment variable.",{
+            }],
+            "client_key": ["","",[], "", "", "path", ["key_file"], "Path to a key file used to authenticate with the API. Can also be specified via K8S_AUTH_KEY_FILE environment variable.",{
+            }],
+            "context": ["","",[], "", "", "str", [], "The name of a context found in the config file. Can also be specified via K8S_AUTH_CONTEXT environment variable.",{
+            }],
+            "continue_on_error": ["","2.0.0",[], "", "False", "bool", [], "Whether to continue on creation/deletion errors when multiple resources are defined.<br/>This has no effect on the validation step which is controlled by the <code>validate.fail_on_error</code> parameter.",{
+            }],
+            "delete_options": ["","1.2.0",[], "", "", "dict", [], "Configure behavior when deleting an object.<br/>Only used when <em>state=absent</em>.",{
+                "gracePeriodSeconds": {
+                    "description": "<p>Specify how many seconds to wait before forcefully terminating.</p><p>Only implemented for Pod resources.</p><p>If not specified, the default grace period for the object type will be used.</p>",
+                    "full_key": "[&quot;delete_options&quot;, &quot;gracePeriodSeconds&quot;]",
+                    "type": "int"
+                },
+                "preconditions": {
+                    "description": "<p>Specify condition that must be met for delete to proceed.</p>",
+                    "full_key": "[&quot;delete_options&quot;, &quot;preconditions&quot;]",
+                    "suboptions": {
+                        "resourceVersion": {
+                            "description": "<p>Specify the resource version of the target object.</p>",
+                            "full_key": "[&quot;delete_options&quot;, &quot;preconditions&quot;, &quot;resourceVersion&quot;]",
+                            "type": "str"
+                        },
+                        "uid": {
+                            "description": "<p>Specify the UID of the target object.</p>",
+                            "full_key": "[&quot;delete_options&quot;, &quot;preconditions&quot;, &quot;uid&quot;]",
+                            "type": "str"
+                        }
+                    },
+                    "type": "dict"
+                },
+                "propagationPolicy": {
+                    "choices": ["Foreground","Background","Orphan"],
+                    "description": "<p>Use to control how dependent objects are deleted.</p><p>If not specified, the default policy for the object type will be used. This may vary across object types.</p>",
+                    "full_key": "[&quot;delete_options&quot;, &quot;propagationPolicy&quot;]",
+                    "type": "str"
+                }
+            }],
+            "force": ["","",[], "", "False", "bool", [], "If set to <code>yes</code>, and <em>state</em> is <code>present</code>, an existing object will be replaced.",{
+            }],
+            "host": ["","",[], "", "", "str", [], "Provide a URL for accessing the API. Can also be specified via K8S_AUTH_HOST environment variable.",{
+            }],
+            "kind": ["","",[], "", "", "str", [], "Use to specify an object model.<br/>Use to create, delete, or discover an object without providing a full resource definition.<br/>Use in conjunction with <em>api_version</em>, <em>name</em>, and <em>namespace</em> to identify a specific object.<br/>If <em>resource definition</em> is provided, the <em>kind</em> value from the <em>resource_definition</em> will override this option.",{
+            }],
+            "kubeconfig": ["","",[], "", "", "path", [], "Path to an existing Kubernetes config file. If not provided, and no other connection options are provided, the Kubernetes client will attempt to load the default configuration file from <em>~/.kube/config</em>. Can also be specified via K8S_AUTH_KUBECONFIG environment variable.",{
+            }],
+            "merge_type": ["","",["json","merge","strategic-merge"], "", "", "list", [], "Whether to override the default patch merge approach with a specific type. By default, the strategic merge will typically be used.<br/>For example, Custom Resource Definitions typically aren&#x27;t updatable by the usual strategic merge. You may want to use <code>merge</code> if you see &quot;strategic merge patch format is not supported&quot;<br/>See <a href='https://kubernetes.io/docs/tasks/run-application/update-api-object-kubectl-patch/#use-a-json-merge-patch-to-update-a-deployment'>https://kubernetes.io/docs/tasks/run-application/update-api-object-kubectl-patch/#use-a-json-merge-patch-to-update-a-deployment</a><br/>If more than one <code>merge_type</code> is given, the merge_types will be tried in order. This defaults to <code>[&#x27;strategic-merge&#x27;, &#x27;merge&#x27;]</code>, which is ideal for using the same parameters on resource kinds that combine Custom Resources and built-in resources.<br/>mutually exclusive with <code>apply</code><br/><em>merge_type=json</em> is deprecated and will be removed in version 3.0.0. Please use <pre>community.kubernetes.k8s_json_patch</pre> instead.",{
+            }],
+            "name": ["","",[], "", "", "str", [], "Use to specify an object name.<br/>Use to create, delete, or discover an object without providing a full resource definition.<br/>Use in conjunction with <em>api_version</em>, <em>kind</em> and <em>namespace</em> to identify a specific object.<br/>If <em>resource definition</em> is provided, the <em>metadata.name</em> value from the <em>resource_definition</em> will override this option.",{
+            }],
+            "namespace": ["","",[], "", "", "str", [], "Use to specify an object namespace.<br/>Useful when creating, deleting, or discovering an object without providing a full resource definition.<br/>Use in conjunction with <em>api_version</em>, <em>kind</em>, and <em>name</em> to identify a specific object.<br/>If <em>resource definition</em> is provided, the <em>metadata.namespace</em> value from the <em>resource_definition</em> will override this option.",{
+            }],
+            "password": ["","",[], "", "", "str", [], "Provide a password for authenticating with the API. Can also be specified via K8S_AUTH_PASSWORD environment variable.<br/>Please read the description of the <code>username</code> option for a discussion of when this option is applicable.",{
+            }],
+            "persist_config": ["","",[], "", "", "bool", [], "Whether or not to save the kube config refresh tokens. Can also be specified via K8S_AUTH_PERSIST_CONFIG environment variable.<br/>When the k8s context is using a user credentials with refresh tokens (like oidc or gke/gcloud auth), the token is refreshed by the k8s python client library but not saved by default. So the old refresh token can expire and the next auth might fail. Setting this flag to true will tell the k8s python client to save the new refresh token to the kube config file.<br/>Default to false.<br/>Please note that the current version of the k8s python client library does not support setting this flag to True yet.<br/>The fix for this k8s python library is here: https://github.com/kubernetes-client/python-base/pull/169",{
+            }],
+            "proxy": ["","",[], "", "", "str", [], "The URL of an HTTP proxy to use for the connection. Can also be specified via K8S_AUTH_PROXY environment variable.<br/>Please note that this module does not pick up typical proxy settings from the environment (e.g. HTTP_PROXY).",{
+            }],
+            "proxy_headers": ["","2.0.0",[], "", "", "dict", [], "The Header used for the HTTP proxy.<br/>Documentation can be found here <a href='https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers'>https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html?highlight=proxy_headers#urllib3.util.make_headers</a>.",{
+                "basic_auth": {
+                    "description": "<p>Colon-separated username:password for basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;basic_auth&quot;]",
+                    "type": "str"
+                },
+                "proxy_basic_auth": {
+                    "description": "<p>Colon-separated username:password for proxy basic authentication header.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_PROXY_BASIC_AUTH environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;proxy_basic_auth&quot;]",
+                    "type": "str"
+                },
+                "user_agent": {
+                    "description": "<p>String representing the user-agent you want, such as foo/1.0.</p><p>Can also be specified via K8S_AUTH_PROXY_HEADERS_USER_AGENT environment.</p>",
+                    "full_key": "[&quot;proxy_headers&quot;, &quot;user_agent&quot;]",
+                    "type": "str"
+                }
+            }],
+            "resource_definition": ["","",[], "", "", "", ["definition","inline"], "Provide a valid YAML definition (either as a string, list, or dict) for an object when creating or updating.<br/>NOTE: <em>kind</em>, <em>api_version</em>, <em>name</em>, and <em>namespace</em> will be overwritten by corresponding values found in the provided <em>resource_definition</em>.",{
+            }],
+            "src": ["","",[], "", "", "path", [], "Provide a path to a file containing a valid YAML definition of an object or objects to be created or updated. Mutually exclusive with <em>resource_definition</em>. NOTE: <em>kind</em>, <em>api_version</em>, <em>name</em>, and <em>namespace</em> will be overwritten by corresponding values found in the configuration read in from the <em>src</em> file.<br/>Reads from the local file system. To read from the Ansible controller&#x27;s file system, including vaulted files, use the file lookup plugin or template lookup plugin, combined with the from_yaml filter, and pass the result to <em>resource_definition</em>. See Examples below.<br/>Mutually exclusive with <em>template</em> in case of <pre>k8s</pre> module.",{
+            }],
+            "state": ["","",["absent","present","patched"], "present", "", "str", [], "Determines if an object should be created, patched, or deleted. When set to <code>present</code>, an object will be created, if it does not already exist. If set to <code>absent</code>, an existing object will be deleted. If set to <code>present</code>, an existing object will be patched, if its attributes differ from those specified using <em>resource_definition</em> or <em>src</em>.<br/><code>patched</code> state is an existing resource that has a given patch applied. If the resource doesn&#x27;t exist, silently skip it (do not raise an error).",{
+            }],
+            "template": ["","",[], "", "", "raw", [], "Provide a valid YAML template definition file for an object when creating or updating.<br/>Value can be provided as string or dictionary.<br/>Mutually exclusive with <code>src</code> and <code>resource_definition</code>.<br/>Template files needs to be present on the Ansible Controller&#x27;s file system.<br/>Additional parameters can be specified using dictionary.<br/>Valid additional parameters -<br/><code>newline_sequence</code> (str): Specify the newline sequence to use for templating files. valid choices are &quot;\\n&quot;, &quot;\\r&quot;, &quot;\\r\\n&quot;. Default value &quot;\\n&quot;.<br/><code>block_start_string</code> (str): The string marking the beginning of a block. Default value &quot;{%&quot;.<br/><code>block_end_string</code> (str): The string marking the end of a block. Default value &quot;%}&quot;.<br/><code>variable_start_string</code> (str): The string marking the beginning of a print statement. Default value &quot;{{&quot;.<br/><code>variable_end_string</code> (str): The string marking the end of a print statement. Default value &quot;}}&quot;.<br/><code>trim_blocks</code> (bool): Determine when newlines should be removed from blocks. When set to <code>yes</code> the first newline after a block is removed (block, not variable tag!). Default value is true.<br/><code>lstrip_blocks</code> (bool): Determine when leading spaces and tabs should be stripped. When set to <code>yes</code> leading spaces and tabs are stripped from the start of a line to a block. This functionality requires Jinja 2.7 or newer. Default value is false.",{
+            }],
+            "username": ["","",[], "", "", "str", [], "Provide a username for authenticating with the API. Can also be specified via K8S_AUTH_USERNAME environment variable.<br/>Please note that this only works with clusters configured to use HTTP Basic Auth. If your cluster has a different form of authentication (e.g. OAuth2 in OpenShift), this option will not work as expected and you should look into the <pre>community.okd.k8s_auth</pre> module, as that might do what you need.",{
+            }],
+            "validate": ["","",[], "", "", "dict", [], "how (if at all) to validate the resource definition against the kubernetes schema. Requires the kubernetes-validate python module.",{
+                "fail_on_error": {
+                    "description": "<p>whether to fail on validation errors.</p>",
+                    "full_key": "[&quot;validate&quot;, &quot;fail_on_error&quot;]",
+                    "type": "bool"
+                },
+                "strict": {
+                    "default": "True",
+                    "description": "<p>whether to fail when passing unexpected properties</p>",
+                    "full_key": "[&quot;validate&quot;, &quot;strict&quot;]",
+                    "type": "bool"
+                },
+                "version": {
+                    "description": "<p>version of Kubernetes to validate against. defaults to Kubernetes server version</p>",
+                    "full_key": "[&quot;validate&quot;, &quot;version&quot;]",
+                    "type": "str"
+                }
+            }],
+            "validate_certs": ["","",[], "", "", "bool", ["verify_ssl"], "Whether or not to verify the API server&#x27;s SSL certificates. Can also be specified via K8S_AUTH_VERIFY_SSL environment variable.",{
+            }],
+            "wait": ["","",[], "", "False", "bool", [], "Whether to wait for certain resource kinds to end up in the desired state.<br/>By default the module exits once Kubernetes has received the request.<br/>Implemented for <code>state=present</code> for <code>Deployment</code>, <code>DaemonSet</code> and <code>Pod</code>, and for <code>state=absent</code> for all resource kinds.<br/>For resource kinds without an implementation, <code>wait</code> returns immediately unless <code>wait_condition</code> is set.",{
+            }],
+            "wait_condition": ["","",[], "", "", "dict", [], "Specifies a custom condition on the status to wait for.<br/>Ignored if <code>wait</code> is not set or is set to False.",{
+                "reason": {
+                    "description": "<p>The value of the reason field in your desired condition</p><p>For example, if a <code>Deployment</code> is paused, The <code>Progressing</code> <code>type</code> will have the <code>DeploymentPaused</code> reason.</p><p>The possible reasons in a condition are specific to each resource type in Kubernetes.</p><p>See the API documentation of the status field for a given resource to see possible choices.</p>",
+                    "full_key": "[&quot;wait_condition&quot;, &quot;reason&quot;]",
+                    "type": "str"
+                },
+                "status": {
+                    "choices": ["True","False","Unknown"],
+                    "default": "True",
+                    "description": "<p>The value of the status field in your desired condition.</p><p>For example, if a <code>Deployment</code> is paused, the <code>Progressing</code> <code>type</code> will have the <code>Unknown</code> status.</p>",
+                    "full_key": "[&quot;wait_condition&quot;, &quot;status&quot;]",
+                    "type": "str"
+                },
+                "type": {
+                    "description": "<p>The type of condition to wait for.</p><p>For example, the <code>Pod</code> resource will set the <code>Ready</code> condition (among others).</p><p>Required if you are specifying a <code>wait_condition</code>.</p><p>If left empty, the <code>wait_condition</code> field will be ignored.</p><p>The possible types for a condition are specific to each resource type in Kubernetes.</p><p>See the API documentation of the status field for a given resource to see possible choices.</p>",
+                    "full_key": "[&quot;wait_condition&quot;, &quot;type&quot;]",
+                    "type": "str"
+                }
+            }],
+            "wait_sleep": ["","",[], "", "5", "int", [], "Number of seconds to sleep between checks.",{
+            }],
+            "wait_timeout": ["","",[], "", "120", "int", [], "How long in seconds to wait for the resource to end up in the desired state.<br/>Ignored if <code>wait</code> is not set.",{
+            }]
+        }
+    }
+}

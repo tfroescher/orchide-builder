@@ -1,0 +1,98 @@
+{"helm_info": {
+        "version": "0.11.0",
+        "collection_version": "2.1.1",
+        "deprecated": "yes",
+        "removedin": "",
+        "alias": "",
+        "replacedby": "kubernetes.core.helm_info",
+        "namespace": "community.kubernetes",
+        "categorygroup": "" ,
+        "category": "",
+        "short_description": "Get information from Helm package deployed inside the cluster",
+        "returndocs": {
+            "status": {
+                "contains": {
+                    "app_version": {
+                        "description": "Version of app deployed",
+                        "full_key": "[&quot;status&quot;, &quot;app_version&quot;]",
+                        "returned": "always",
+                        "type": "str"
+                    },
+                    "chart": {
+                        "description": "Chart name and chart version",
+                        "full_key": "[&quot;status&quot;, &quot;chart&quot;]",
+                        "returned": "always",
+                        "type": "str"
+                    },
+                    "name": {
+                        "description": "Name of the release",
+                        "full_key": "[&quot;status&quot;, &quot;name&quot;]",
+                        "returned": "always",
+                        "type": "str"
+                    },
+                    "namespace": {
+                        "description": "Namespace where the release is deployed",
+                        "full_key": "[&quot;status&quot;, &quot;namespace&quot;]",
+                        "returned": "always",
+                        "type": "str"
+                    },
+                    "revision": {
+                        "description": "Number of time where the release has been updated",
+                        "full_key": "[&quot;status&quot;, &quot;revision&quot;]",
+                        "returned": "always",
+                        "type": "str"
+                    },
+                    "status": {
+                        "description": "Status of release (can be DEPLOYED, FAILED, ...)",
+                        "full_key": "[&quot;status&quot;, &quot;status&quot;]",
+                        "returned": "always",
+                        "type": "str"
+                    },
+                    "updated": {
+                        "description": "The Date of last update",
+                        "full_key": "[&quot;status&quot;, &quot;updated&quot;]",
+                        "returned": "always",
+                        "type": "str"
+                    },
+                    "values": {
+                        "description": "Dict of Values used to deploy",
+                        "full_key": "[&quot;status&quot;, &quot;values&quot;]",
+                        "returned": "always",
+                        "type": "str"
+                    }
+                },
+                "description": "A dictionary of status output",
+                "full_key": "[&quot;status&quot;]",
+                "returned": "only when release exists",
+                "type": "complex"
+            }
+        },
+        "description": "Get information (values, states, ...) from Helm package deployed inside the cluster.",
+        "docuri": "helm-info",
+        "plainexamples": "\n- name: Deploy latest version of Grafana chart inside monitoring namespace\n community.kubernetes.helm_info:\n    name: test\n    release_namespace: monitoring\n",
+        "metadata": "None",
+        "notes": "",
+        "requirements": ["helm (https://github.com/helm/helm/releases)","yaml (https://pypi.org/project/PyYAML/)"],
+        "authors": "<ul><li>Lucas Boisserie (@LucasBoisserie)</li></ul>",
+        "arguments": {
+            "api_key": ["","1.2.0",[], "", "", "str", [], "Token used to authenticate with the API. Can also be specified via <code>K8S_AUTH_API_KEY</code> environment variable.",{
+            }],
+            "binary_path": ["","",[], "", "", "path", [], "The path of a helm binary to use.",{
+            }],
+            "ca_cert": ["","1.2.0",[], "", "", "path", ["ssl_ca_cert"], "Path to a CA certificate used to authenticate with the API. The full certificate chain must be provided to avoid certificate validation errors. Can also be specified via <code>K8S_AUTH_SSL_CA_CERT</code> environment variable.",{
+            }],
+            "context": ["","",[], "", "", "str", ["kube_context"], "Helm option to specify which kubeconfig context to use.<br/>If the value is not specified in the task, the value of environment variable <code>K8S_AUTH_CONTEXT</code> will be used instead.",{
+            }],
+            "host": ["","1.2.0",[], "", "", "str", [], "Provide a URL for accessing the API. Can also be specified via <code>K8S_AUTH_HOST</code> environment variable.",{
+            }],
+            "kubeconfig": ["","",[], "", "", "path", ["kubeconfig_path"], "Helm option to specify kubeconfig path to use.<br/>If the value is not specified in the task, the value of environment variable <code>K8S_AUTH_KUBECONFIG</code> will be used instead.",{
+            }],
+            "release_name": ["yes","",[], "", "", "str", ["name"], "Release name to manage.",{
+            }],
+            "release_namespace": ["yes","",[], "", "", "str", ["namespace"], "Kubernetes namespace where the chart should be installed.",{
+            }],
+            "validate_certs": ["","1.2.0",[], "", "True", "bool", ["verify_ssl"], "Whether or not to verify the API server&#x27;s SSL certificates. Can also be specified via <code>K8S_AUTH_VERIFY_SSL</code> environment variable.",{
+            }]
+        }
+    }
+}
