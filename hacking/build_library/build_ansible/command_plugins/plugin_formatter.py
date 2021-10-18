@@ -872,7 +872,12 @@ class DocumentPlugins(Command):
                 if display.verbosity >= 5:
                     display.vvvvv(pp.pformat(('record', record)))
                 if record.get('doc', None):
-                    short_desc = record['doc']['short_description'].rstrip('.')
+                    try:
+                        short_desc = record['doc']['short_description'].rstrip('.')
+                    except:
+                        display.v('No short_description available.')
+                        short_desc = ''
+
                     if short_desc is None:
                         display.warning('short_description for %s is None' % key)
                         short_desc = ''

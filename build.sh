@@ -12,6 +12,7 @@ cat << EOF
    -i                               build built-in variant for OrchidE including custom collections
    -a                               Ansible version to build collections for
    -d                               Disable backward collections (currently community.kubernetes) (required for e.g Ansible 4.4.0, kubernetes collections < 2.0.0)
+   -o                               Enable compatiblity for OrchidE < 2020.1.9 (default off)
 
  Commands:
    build-all                        Builds the definition package (clean, download collections, create definitions, pack jar)
@@ -32,6 +33,7 @@ JVM_ARGS=""
 PARAMS=""
 ANSIBLE_VERSION=""
 WITHOUT_PATCHES=""
+WITH_210_PACKAGE=""
 
 if [ $# == 0 ]; then
     help
@@ -60,14 +62,17 @@ for (( i=0; i<$# ; i++ )) ; do
             ;;
         -f )
             BUILDFILE="${params[i+1]}"
-            unset params[i+1]
+            unset "params[i+1]"
             ;;
         -a )
             ANSIBLE_VERSION=-Dtarget_ansible_version=${params[i+1]}
-            unset params[i+1]
+            unset "params[i+1]"
             ;;
         -d )
             WITHOUT_PATCHES="-Dcreate-static-patches.disabled=true"
+            ;;
+        -o )
+            WITH_210_PACKAGE="-Dbuild-210-package=true"
             ;;
         * )
             if [[ "${params[i]}" =~ .*"-D".* ]] ; then
@@ -82,7 +87,7 @@ done
 if [ -n $ANSIBLE_VERSION ]; then
 
 echo ant $LIB -Dbasedir=$TOOLDIR -Dtooldir=$TOOLDIR -f $BUILDFILE $ANSIBLE_VERSION $JVM_ARGS $WITHOUT_PATCHES $ARGS $PARAMS
-ant $LIB -Dbasedir=$TOOLDIR -Dtooldir=$TOOLDIR -f $BUILDFILE  $ANSIBLE_VERSION $JVM_ARGS $WITHOUT_PATCHES -Denable.completePackage=true $ARGS $PARAMS
+ant $LIB -Dbasedir=$TOOLDIR -Dtooldir=$TOOLDIR -f $BUILDFILE  $ANSIBLE_VERSION $JVM_ARGS $WITHOUT_PATCHES $WITH_210_PACKAGE -Denable.completePackage=true $ARGS $PARAMS
 
 else
 

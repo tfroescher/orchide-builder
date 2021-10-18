@@ -450,7 +450,7 @@ ${module.definitions}
             </fileset>
         </copy>
     </target>
-    <target name="create-210-package" description="Creates backward compatiblity directory structure">
+    <target name="create-210-package" description="Creates backward compatiblity directory structure" if="${build-210-package}">
         <copy todir="${dist}/references/external/module-210">
             <fileset dir="${dist}/references/external/module">
             </fileset>
