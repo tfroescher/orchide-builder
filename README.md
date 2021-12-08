@@ -18,14 +18,16 @@ OrchidE-Builder packages for Ansible 4.4.0, 20210816 and newer **require** at le
 
 To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 
-1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/latest) or a specific Ansible version [4.4.0](https://github.com/tfroescher/orchide-builder/releases/4.4.0),
+1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/latest) or a specific Ansible version 
+   [4.9.0](https://github.com/tfroescher/orchide-builder/releases/4.9.0),
+   [4.4.0](https://github.com/tfroescher/orchide-builder/releases/4.4.0),
    [4.0.0](https://github.com/tfroescher/orchide-builder/releases/4.0.0),
    [3.4.0](https://github.com/tfroescher/orchide-builder/releases/3.4.0).
-1. Create a directory on your filesystem - p.e. `~/.orchide` and put the downloaded .jar there.
-1. Open IDE settings > Languages & Frameworks > OrchidE > Extension.
-1. Add the path to your newly created directory.
-1. Hit `Apply`.
-1. Restart your IDE.
+2. Create a directory on your filesystem - p.e. `~/.orchide` and put the downloaded .jar there.
+3. Open IDE settings > Languages & Frameworks > OrchidE > Extension.
+4. Add the path to your newly created directory.
+5. Hit `Apply`.
+6. Restart your IDE.
 
 ## Getting started - create your own definition package
 
@@ -36,7 +38,7 @@ Any collection that documents the meta information as Ansible can be used as a s
 
 ### Pre-requisites
 * WSL, Linux or MacOS
-* Python 3 (tested with 3.6)
+* Python 3 (tested with 3.9)
 * Python pip3, pipenv
 * Bash
 * a Java (JDK) version 8 - 14
