@@ -69,6 +69,7 @@ google.cloud
 hetzner.hcloud
 hpe.nimble
 ibm.qradar
+infoblox.nios_modules
 infinidat.infinibox
 inspur.sm
 junipernetworks.junos

@@ -19,6 +19,7 @@ OrchidE-Builder packages for Ansible 4.4.0, 20210816 and newer **require** at le
 To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 
 1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/latest) or a specific Ansible version 
+   [5.0.1](https://github.com/tfroescher/orchide-builder/releases/5.0.1),
    [4.9.0](https://github.com/tfroescher/orchide-builder/releases/4.9.0),
    [4.4.0](https://github.com/tfroescher/orchide-builder/releases/4.4.0),
    [4.0.0](https://github.com/tfroescher/orchide-builder/releases/4.0.0),
