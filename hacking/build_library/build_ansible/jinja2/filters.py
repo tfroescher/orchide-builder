@@ -134,7 +134,7 @@ def html_desc(description_lines):
     if isinstance(description_lines, string_types):
         return html_ify(quote_backslash(description_lines))
 
-    if isinstance(description_lines, collections.Iterable):
+    if isinstance(description_lines, collections.abc.Iterable):
         t = ""
         for line in description_lines:
             ht = html_ify(quote_backslash(line))
