@@ -1,5 +1,5 @@
-# Release 2022-04-26
-# ansible-core 2.12.4
+# Release 2022-04-27
+# ansible-core 2.12.5
 amazon.aws
 ansible.netcommon
 ansible.posix
