@@ -39,6 +39,7 @@
     <macrodef name="galaxy" uri="antlib:macros">
         <attribute name="collection"/>
         <sequential>
+            <m:log message="*****************************"/>
             <m:log message="Downloading @{collection} ..."/>
             <var name="error" unset="yes"/>
             <var name="output" unset="yes"/>
