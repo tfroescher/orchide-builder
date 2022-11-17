@@ -1,5 +1,7 @@
 {
   "excludes": [
+    "add_host",
+    "ansible.builtin.add_host",
     "ansible.builtin.set_fact",
     "local_action",
     "set_fact"
