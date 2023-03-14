@@ -268,7 +268,7 @@ ${module.definitions}
             </sequential>
         </for>
     </target>
-    <target name="prepare-ansible-base" description="Copies Ansible builtin modules for module definition creation">
+    <target name="prepare-ansible-base" description="Copies Ansible builtin modules for module definition creation" unless="${prepare-ansible-base.disabled}">
         <exec dir="." errorproperty="error" executable="sh" outputproperty="output"
               resolveexecutable="true" taskname="shell" failonerror="no"
               logerror="yes" resultproperty="result" newenvironment="no">
@@ -405,8 +405,15 @@ ${module.definitions}
                     <finally>
                         <m:log message="${output}"/>
                         <m:log message="${error}"/>
-                        <m:log file="${build}/build-ansible-warnings.log" append="yes"><![CDATA[${error}
+                        <if>
+                            <not>
+                                <equals arg1="${error}" arg2="" trim="true"/>
+                            </not>
+                            <then>
+                                <m:log file="${build}/build-ansible-warnings.log" append="yes"><![CDATA[${error}
 ]]></m:log>
+                            </then>
+                        </if>
                         <m:log message="Result ${result}"/>
                     </finally>
                 </trycatch>
@@ -468,7 +475,7 @@ ${module.definitions}
             </fileset>
         </jar>
     </target>
-    <target name="validate-json" description="Validate generated json" depends="-config">
+    <target name="validate-json" description="Validate generated json" depends="-config" unless="${validate-json.disabled}">
         <for param="jsonfile">
             <path>
                 <fileset dir="${references}">
@@ -504,8 +511,11 @@ ${module.definitions}
         </for>
     </target>
     <target name="patch-freeform" description="Correct json syntax of tasks with free-form keys" depends="-config">
+        <replaceregexp file="${modules}/modules/ansible.builtin/import_tasks.json" match="\}\](?!.*\])," replace="\}\]" byline="no" flags="gs"/>
         <replaceregexp file="${modules}/modules/ansible.builtin/include_tasks.json" match="\](?!.*\])," replace="\]" byline="no" flags="gs"/>
         <replaceregexp file="${modules}/modules/ansible.builtin/raw.json" match="\](?!.*\])," replace="\]" byline="no" flags="gs"/>
+        <replaceregexp file="${modules}/modules/ansible.compat/include_tasks.json" match="\](?!.*\])," replace="\]" byline="no" flags="gs"/>
+        <replaceregexp file="${modules}/modules/ansible.compat/raw.json" match="\](?!.*\])," replace="\]" byline="no" flags="gs"/>
     </target>
     <target name="build-all" description="Run all build steps">
         <runtarget target="-config"/>

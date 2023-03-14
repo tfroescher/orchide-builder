@@ -19,17 +19,22 @@ OrchidE-Builder packages for Ansible 4.4.0, 20210816 and newer **require** at le
 To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 
 1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/latest) or a specific Ansible version 
+   * [7.3.0](https://github.com/tfroescher/orchide-builder/releases/7.3.0),
+   [7.2.0](https://github.com/tfroescher/orchide-builder/releases/7.2.0),
+   [7.1.0](https://github.com/tfroescher/orchide-builder/releases/7.1.0),
+   [7.0.0](https://github.com/tfroescher/orchide-builder/releases/7.0.0),
+   * [6.7.0](https://github.com/tfroescher/orchide-builder/releases/6.7.0),
    [6.6.0](https://github.com/tfroescher/orchide-builder/releases/6.6.0),
    [6.5.0](https://github.com/tfroescher/orchide-builder/releases/6.5.0),
    [6.1.0](https://github.com/tfroescher/orchide-builder/releases/6.1.0),
-   [5.10.0](https://github.com/tfroescher/orchide-builder/releases/5.10.0),
+   * [5.10.0](https://github.com/tfroescher/orchide-builder/releases/5.10.0),
    [5.9.0](https://github.com/tfroescher/orchide-builder/releases/5.9.0),
    [5.7.0](https://github.com/tfroescher/orchide-builder/releases/5.7.0),
    [5.6.0](https://github.com/tfroescher/orchide-builder/releases/5.6.0),
    [5.5.0](https://github.com/tfroescher/orchide-builder/releases/5.5.0),
    [5.3.0](https://github.com/tfroescher/orchide-builder/releases/5.3.0),
    [5.0.1](https://github.com/tfroescher/orchide-builder/releases/5.0.1),
-   [4.9.0](https://github.com/tfroescher/orchide-builder/releases/4.9.0),
+   * [4.9.0](https://github.com/tfroescher/orchide-builder/releases/4.9.0),
    [4.4.0](https://github.com/tfroescher/orchide-builder/releases/4.4.0),
    [4.0.0](https://github.com/tfroescher/orchide-builder/releases/4.0.0),
    [3.4.0](https://github.com/tfroescher/orchide-builder/releases/3.4.0).
