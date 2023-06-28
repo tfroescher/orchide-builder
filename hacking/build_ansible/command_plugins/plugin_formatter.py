@@ -21,6 +21,10 @@ from distutils.version import LooseVersion
 from functools import partial
 from pprint import PrettyPrinter
 
+from ansible.plugins.loader import PluginLoader
+from ansible.plugins import loader
+from ansible.utils.collection_loader import AnsibleCollectionConfig
+
 try:
     from html import escape as html_escape
 except ImportError:
@@ -40,7 +44,7 @@ from ansible.module_utils._text import to_bytes
 from ansible.module_utils.common.collections import is_sequence
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.module_utils.six import iteritems, string_types
-from ansible.plugins.loader import fragment_loader
+#from ansible.plugins.loader import fragment_loader
 from ansible.utils import plugin_docs
 from ansible.utils.display import Display
 
@@ -166,7 +170,7 @@ def get_plugin_info(module_dir, limit_to=None, verbose=False):
 
     categories = dict()
     module_info = defaultdict(dict)
-
+    display.v("Getting plugin info ...")
     # * windows powershell modules have documentation stubs in python docstring
     #   format (they are not executed) so skip the ps1 format files
     # * One glob level for every module level that we're going to traverse
@@ -176,6 +180,7 @@ def get_plugin_info(module_dir, limit_to=None, verbose=False):
             glob.glob("%s/*/*/*.py" % module_dir) +
             glob.glob("%s/*/*/*/*.py" % module_dir)
     )
+    display.vvv("using files: %s" % files)
 
     module_index = 0
     for module_path in files:
@@ -239,10 +244,24 @@ def get_plugin_info(module_dir, limit_to=None, verbose=False):
         show_progress(module_index)
 
         # use ansible core library to parse out doc metadata YAML and plaintext examples
+        display.v("#### Loading doc including fragments ...")
+
+        doc_fragement_path = [] # MYCONSTANT.DOC_FRAGMENT_PLUGIN_PATH
+        #display.v("Original doc fragments: %s" % doc_fragement_path)
+        if not AnsibleCollectionConfig.collection_finder:
+            loader.init_plugin_loader()
+
+        fragment_loader2 = PluginLoader(
+            'ModuleDocFragment',
+            'ansible.plugins.doc_fragments',
+            doc_fragement_path,
+            'doc_fragments',
+        )
         try:
-            doc, examples, returndocs, metadata = plugin_docs.get_docstring(
-                module_path, fragment_loader, verbose=verbose, collection_name='ansible.builtin')
+            doc, examples, returndocs, metadata = get_docstring2(
+                module_path, fragment_loader2, verbose=verbose, collection_name='ansible.builtin')
         except Exception as e:
+            display.vvv("Error parsing module %s" % e)
             display.error("Error parsing module: %s" % e)
             continue
 
@@ -457,8 +476,11 @@ def process_returndocs(returndocs, full_key=None):
     if returndocs:
         for (k, v) in iteritems(returndocs):
             # Make sure that "full key" is contained
+            #display.v("Return doc full key %s" % k)
             full_key_k = full_key + [k]
+            #display.v("After key")
             v['full_key'] = full_key_k
+            #display.v("After assignment")
 
             # Strip old version_added information for options
             if 'version_added' in v:
@@ -476,8 +498,10 @@ def process_returndocs(returndocs, full_key=None):
 
 
 def process_plugins(module_map, templates, outputname, output_dir, ansible_version, plugin_type, custom=True, collection_version="", orchideOnly=False):
+    display.v("process_plugins: START")
     for module_index, module in enumerate(module_map):
-
+        display.v("in loop")
+        display.v("process Ansible module:   >>  %s  <<" % module)
         show_progress(module_index)
 
         fname = module_map[module]['path']
@@ -592,14 +616,14 @@ def process_plugins(module_map, templates, outputname, output_dir, ansible_versi
             try:
                 text = templates['orchide'].render(doc)
             except Exception as e:
-                display.warning(msg="Could not parse %s due to %s" % (module, e))
+                display.warning(msg="Could not parse %s (orchide) due to %s" % (module, e))
                 continue
 
         else:
             try:
                 text = templates['plugin'].render(doc)
             except Exception as e:
-                display.warning(msg="Could not parse %s due to %s" % (module, e))
+                display.warning(msg="Could not parse %s (plugin) due to %s" % (module, e))
                 continue
 
         if LooseVersion(jinja2.__version__) < LooseVersion('2.10'):
@@ -627,7 +651,8 @@ def process_plugins(module_map, templates, outputname, output_dir, ansible_versi
                         text = re.sub(' +\n', '\n', text)
 
                     write_data(text, output_dir, outputname, alias)
-
+        display.v("end loop")
+    display.v("end process_plugins")
 
 def process_categories(plugin_info, categories, templates, output_dir, output_name, plugin_type):
     # For some reason, this line is changing plugin_info:
@@ -844,6 +869,7 @@ class DocumentPlugins(Command):
         if args.limit_to is not None:
             args.limit_to = [s.lower() for s in args.limit_to.split(",")]
 
+        display.vv("get_plugin_info")
         plugin_info, categories = get_plugin_info(args.module_dir, limit_to=args.limit_to, verbose=(args.verbosity > 0))
 
         categories['all'] = {'_modules': plugin_info.keys()}
@@ -852,19 +878,6 @@ class DocumentPlugins(Command):
         if display.verbosity >= 5:
             display.vvvvv(pp.pformat(plugin_info))
 
-        # Transform the data
-        if args.type == 'rst':
-            display.v('Generating rst')
-            for key, record in plugin_info.items():
-                display.vv(key)
-                if display.verbosity >= 5:
-                    display.vvvvv(pp.pformat(('record', record)))
-                if record.get('doc', None):
-                    short_desc = record['doc']['short_description'].rstrip('.')
-                    if short_desc is None:
-                        display.warning('short_description for %s is None' % key)
-                        short_desc = ''
-                    record['doc']['short_description'] = rst_ify(short_desc)
         if args.type == 'json':
             display.v('Generating json')
             for key, record in plugin_info.items():
@@ -915,3 +928,40 @@ class DocumentPlugins(Command):
 
 
         return 0
+
+def get_docstring2(filename, fragment_loader, verbose=False, ignore_errors=False, collection_name=None, is_module=None, plugin_type=None):
+    """
+    DOCUMENTATION can be extended using documentation fragments loaded by the PluginLoader from the doc_fragments plugins.
+    """
+
+    if is_module is None:
+        if plugin_type is None:
+            is_module = False
+        else:
+            is_module = (plugin_type == 'module')
+    else:
+        # TODO deprecate is_module argument, now that we have 'type'
+        pass
+
+    data = plugin_docs.read_docstring(filename, verbose=verbose, ignore_errors=ignore_errors)
+    #display.v("#### read_docstring %s" % data)
+
+    display.v("Getting docs ...")
+    if data.get('doc', False):
+        # add collection name to versions and dates
+        display.v("Getting collection versions and dates ...")
+        if collection_name is not None:
+            plugin_docs.add_collection_to_versions_and_dates(data['doc'], collection_name, is_module=is_module)
+
+        # add fragments to documentation
+        display.v("Getting doc fragments ...")
+        plugin_docs.add_fragments(data['doc'], filename, fragment_loader=fragment_loader, is_module=is_module)
+
+    display.v("Getting returndocs ...")
+    if data.get('returndocs', False):
+        # add collection name to versions and dates
+        if collection_name is not None:
+            plugin_docs.add_collection_to_versions_and_dates(data['returndocs'], collection_name, is_module=is_module, return_docs=True)
+
+    display.v("return get_docstring2")
+    return data['doc'], data['plainexamples'], data['returndocs'], data['metadata']
