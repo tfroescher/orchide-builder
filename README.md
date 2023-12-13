@@ -1,10 +1,10 @@
 # OrchidE definition file builder
 A tool to generate parser and code definitions for the IntelliJ plugin OrchidE.
 
-The tool generates meta information from Ansible Galaxy collection to be used by OrchidE 
+The tool generates meta-information from Ansible Galaxy collections to be used by OrchidE 
 * for parsing Ansible playbooks and roles
 * for code completion suggestions
-* for various inspection to check for valid code snippets.
+* for various inspections to check for valid code snippets.
 
 ## Getting started - ready to use definitions
 
@@ -18,8 +18,11 @@ OrchidE-Builder packages for Ansible 4.4.0, 20210816 and newer **require** at le
 
 To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 
-1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/latest) or a specific Ansible version 
-   * [8.4.0](https://github.com/tfroescher/orchide-builder/releases/8.4.0),
+1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/latest) or a specific Ansible version  
+   * [8.7.0](https://github.com/tfroescher/orchide-builder/releases/8.7.0),
+   [8.6.1](https://github.com/tfroescher/orchide-builder/releases/8.6.1),
+   [8.5.0](https://github.com/tfroescher/orchide-builder/releases/8.5.0),
+   [8.4.0](https://github.com/tfroescher/orchide-builder/releases/8.4.0),
    [8.3.0](https://github.com/tfroescher/orchide-builder/releases/8.3.0),
    [8.2.0](https://github.com/tfroescher/orchide-builder/releases/8.2.0),
    [8.1.0](https://github.com/tfroescher/orchide-builder/releases/8.1.0),
@@ -55,7 +58,7 @@ To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 ### General information
 
 To use Ansible collections that are not part of OrchidE, that are newer or that from other sources you can create your own package.
-Any collection that documents the meta information as Ansible can be used as a source.
+Any collection that documents the meta-information as Ansible can be used as a source.
 
 ### Pre-requisites
 * WSL, Linux or MacOS
@@ -85,8 +88,8 @@ Any collection that documents the meta information as Ansible can be used as a s
 1. Configure the Ansible collection
 
     1. Create a new configuration file from an existing one in the res folder 
-       * for latest version copy a file with *date version*
-       * for a list of collections with specific version copy a file with Ansible version
+       * for the latest version, copy a file with *date version*
+       * for a list of collections with specific version, copy a file with Ansible version
     1. Add / remove collections you want 
 1. Run
     ```shell
@@ -95,19 +98,19 @@ Any collection that documents the meta information as Ansible can be used as a s
     ``` 
    
 1. Copy the built jar (./build/dist/orchide-definitions.jar) to the OrchidE's configured extension directory. 
-   (set in Settings > Languages & Frameworks > OrchidE > Extension )
+   (set in Settings > Languages & Frameworks > OrchidE > Extension)
    
 ## Reporting Issues
 
 If you're missing an Ansible Galaxy collection, experience a problem or have any other issue, please file an issue.
-You can also reach out me via [support@orchide.dev](mailto:support@orchide.dev). 
+You can also reach out to me via [support@orchide.dev](mailto:support@orchide.dev). 
 
 
 ## Acknowledgments
 
 This repository uses code from the Ansible project.
 
-Thank you to the awesome [Ansible](https://github.com/ansible/ansible) project.
+Thank you for the awesome [Ansible](https://github.com/ansible/ansible) project.
 
 ## License
 
