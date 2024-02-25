@@ -113,6 +113,7 @@
             </then>
         </if>
         <property name="modules" value="${references}/module${ansible_version_postfix}"/>
+        <mkdir dir="${references}/plugins"/>
     </target>
     <target name="prepare-ansible-release" description="Load collection list" depends="-config" unless="${prepare-ansible-release.disabled}">
         <property name="target_ansible_version" value="3.0.0"/>
@@ -307,7 +308,7 @@ ${module.definitions}
 ]]>
         </echo>
     </target>
-    <target name="create-definitions" description="Create module definitions" depends="-config">
+    <target name="create-definitions" description="Create module definitions" depends="-config" unless="${create-definitions.disabled}">
         <property name="custom_modules" value="true"/>
         <mkdir dir="${json}"/>
         <mkdir dir="${dist}"/>
@@ -451,6 +452,20 @@ ${module.definitions}
             </fileset>
         </copy>
     </target>
+    <target name="create-static-plugins" description="Creates documentation for plugins" depends="-config">
+        <exec dir="." executable="./bin/dumpFromAnsibleDoc.sh"/>
+        <!-- target_ansible_version -->
+        <for param="plugin-file">
+            <fileset dir="${dist}/references/external/plugins">
+                <include name="*.json"/>
+            </fileset>
+            <sequential>
+                <m:log><![CDATA[Adding ${target_ansible_version} info to @{plugin-file}]]></m:log>
+                <replaceregexp file="@{plugin-file}" match="^\{" replace="\{  &quot;based_on&quot;: &quot;${target_ansible_version}&quot;," byline="no" flags="s"/>
+            </sequential>
+        </for>
+
+    </target>
     <target name="create-static-patches" description="Copies static overwrites of generated definition files" depends="-config" unless="${create-static-patches.disabled}">
         <copy todir="${references}" overwrite="no" verbose="yes">
             <fileset dir="src/main/resources/static/references">
@@ -539,6 +554,7 @@ ${module.definitions}
         <runtarget target="patch-freeform"/>
         <runtarget target="create-static"/>
         <runtarget target="create-static-patches"/>
+        <runtarget target="create-static-plugins"/>
         <runtarget target="validate-json"/>
         <runtarget target="create-210-package"/>
         <runtarget target="jar"/>
