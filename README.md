@@ -10,6 +10,9 @@ The tool generates meta-information from Ansible Galaxy collections to be used b
 
 ### Compatiblity of releases
 
+Support for Ansible plugins is included in packages for Ansible version 9.0 and newer, 
+in 8.7.0 Update 1, in 7.7.0 Update 1 and since the package 20240225.
+
 OrchidE-Builder packages for Ansible 4.4.0, 20210816 and newer **require** at least 
 [OrchidE plugin](https://plugins.jetbrains.com/plugin/12626-orchide--ansible-language-support) version 2020.1.5.
 
@@ -25,7 +28,8 @@ To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
    [9.2.0](https://github.com/tfroescher/orchide-builder/releases/9.2.0),
    [9.1.0](https://github.com/tfroescher/orchide-builder/releases/9.1.0),
    [9.0.1](https://github.com/tfroescher/orchide-builder/releases/9.0.1),
-   * [8.7.0](https://github.com/tfroescher/orchide-builder/releases/8.7.0),
+   * [8.7.0 Update 1](https://github.com/tfroescher/orchide-builder/releases/8.7.0.1),
+   [~~8.7.0~~](https://github.com/tfroescher/orchide-builder/releases/8.7.0),
    [8.6.1](https://github.com/tfroescher/orchide-builder/releases/8.6.1),
    [8.5.0](https://github.com/tfroescher/orchide-builder/releases/8.5.0),
    [8.4.0](https://github.com/tfroescher/orchide-builder/releases/8.4.0),
@@ -33,7 +37,8 @@ To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
    [8.2.0](https://github.com/tfroescher/orchide-builder/releases/8.2.0),
    [8.1.0](https://github.com/tfroescher/orchide-builder/releases/8.1.0),
    [8.0.0](https://github.com/tfroescher/orchide-builder/releases/8.0.0),
-   * [7.7.0](https://github.com/tfroescher/orchide-builder/releases/7.7.0),
+   * [7.7.0 Update 1](https://github.com/tfroescher/orchide-builder/releases/7.7.0.1),
+   [~~7.7.0~~](https://github.com/tfroescher/orchide-builder/releases/7.7.0),
    [7.3.0](https://github.com/tfroescher/orchide-builder/releases/7.3.0),
    [7.2.0](https://github.com/tfroescher/orchide-builder/releases/7.2.0),
    [7.1.0](https://github.com/tfroescher/orchide-builder/releases/7.1.0),
