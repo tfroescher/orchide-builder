@@ -82,10 +82,10 @@ Any collection that documents the meta-information as Ansible can be used as a s
 
 ### Install CLI
 
-1. Install Python 3, bash, java and Apache ant via your package manager 
+1. Install Python 3, bash, java, jq and Apache ant via your package manager 
      * e.g for Fedora
          ```shell
-         $ dnf install git ant pipenv 
+         $ dnf install git ant pipenv jq
          ```
 1. Check out this repository
 1. Run
