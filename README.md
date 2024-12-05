@@ -102,10 +102,11 @@ Any collection that documents the meta-information as Ansible can be used as a s
      ```
     within the repository root folder
 
-### Configure galaxy authentication tokens if required
+### Configure a galaxy authentication token if required
 
 If you would like to consume collections from
-https://console.redhat.com you need to provide a token for pulling.
+https://console.redhat.com/ansible/automation-hub you need to provide
+a token.
 
 add the following to `ansible.cfg` in this directory:
 
@@ -141,10 +142,30 @@ For creating a token see [Creating the offline token in automation hub](https://
 1. Copy the built jar (./build/dist/orchide-definitions.jar) to the OrchidE's configured extension directory.
    (set in Settings > Languages & Frameworks > OrchidE > Extension)
 
+### Forcing a specific java version
+
+For example under Fedora if `ant` is installed from rpm, it might be
+necessary to force `ant` to use the right java version. Even if
+`/usr/bin/java` already points to the right version.
+
+For this to work have to set `JAVA_HOME` before calling `build.sh`:
+
+```
+export JAVA_HOME=/usr/lib/jvm/jre-11/lib
+```
+
+You can verify that `ant` is using the right java version (<= 14 see
+above) with
+
+```
+ant -diagnostics
+```
+
 ## Reporting Issues
 
-If you're missing an Ansible Galaxy collection, experience a problem or have any other issue, please file an issue.
-You can also reach out to me via [support@orchide.dev](mailto:support@orchide.dev).
+If you're missing an Ansible Galaxy collection, experience a problem
+or have any other issue, please file an issue.  You can also reach out
+to me via [support@orchide.dev](mailto:support@orchide.dev).
 
 
 ## Acknowledgments
