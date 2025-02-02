@@ -22,11 +22,22 @@ OrchidE-Builder packages for Ansible 4.4.0, 20210816 and newer **require** at le
 To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 
 1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/latest) or a specific Ansible version  
-   * [10.3.0](https://github.com/tfroescher/orchide-builder/releases/10.3.0),
+   * [11.2.0](https://github.com/tfroescher/orchide-builder/releases/11.2.0),
+   [11.1.0](https://github.com/tfroescher/orchide-builder/releases/11.1.0),
+   [11.0.0](https://github.com/tfroescher/orchide-builder/releases/11.0.0),
+   * [10.7.0](https://github.com/tfroescher/orchide-builder/releases/10.7.0),
+   [10.6.0](https://github.com/tfroescher/orchide-builder/releases/10.6.0),
+   [10.5.0](https://github.com/tfroescher/orchide-builder/releases/10.5.0),
+   [10.4.0](https://github.com/tfroescher/orchide-builder/releases/10.4.0),
+   [10.3.0](https://github.com/tfroescher/orchide-builder/releases/10.3.0),
    [10.2.0](https://github.com/tfroescher/orchide-builder/releases/10.2.0),
    [10.1.0](https://github.com/tfroescher/orchide-builder/releases/10.1.0),
    [10.0.1](https://github.com/tfroescher/orchide-builder/releases/10.0.1),
-   * [9.9.0](https://github.com/tfroescher/orchide-builder/releases/9.9.0),
+   * [9.13.0](https://github.com/tfroescher/orchide-builder/releases/9.13.0),
+   [9.12.0](https://github.com/tfroescher/orchide-builder/releases/9.12.0),
+   [9.11.0](https://github.com/tfroescher/orchide-builder/releases/9.11.0),
+   [9.10.0](https://github.com/tfroescher/orchide-builder/releases/9.10.0),
+   [9.9.0](https://github.com/tfroescher/orchide-builder/releases/9.9.0),
    [9.8.0](https://github.com/tfroescher/orchide-builder/releases/9.8.0),
    [9.7.0](https://github.com/tfroescher/orchide-builder/releases/9.7.0),
    [9.6.1](https://github.com/tfroescher/orchide-builder/releases/9.6.1),
@@ -81,7 +92,7 @@ Any collection that documents the meta-information as Ansible can be used as a s
 
 ### Pre-requisites
 * WSL, Linux or MacOS
-* Python 3 (tested with 3.9)
+* Python 3 (tested with 3.9, <3.12)
 * Python pip3, pipenv
 * Bash
 * a Java (JDK) version 8 - 14
