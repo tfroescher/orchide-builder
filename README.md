@@ -1,7 +1,7 @@
 # OrchidE definition file builder
 A tool to generate parser and code definitions for the IntelliJ plugin OrchidE.
 
-The tool generates meta-information from Ansible Galaxy collections to be used by OrchidE 
+The tool generates meta-information from Ansible Galaxy collections to be used by OrchidE
 * for parsing Ansible playbooks and roles
 * for code completion suggestions
 * for various inspections to check for valid code snippets.
@@ -10,10 +10,10 @@ The tool generates meta-information from Ansible Galaxy collections to be used b
 
 ### Compatiblity of releases
 
-Support for Ansible plugins is included in packages for Ansible version 9.0 and newer, 
+Support for Ansible plugins is included in packages for Ansible version 9.0 and newer,
 in 8.7.0 Update 1, in 7.7.0 Update 1 and since the package 20240225.
 
-OrchidE-Builder packages for Ansible 4.4.0, 20210816 and newer **require** at least 
+OrchidE-Builder packages for Ansible 4.4.0, 20210816 and newer **require** at least
 [OrchidE plugin](https://plugins.jetbrains.com/plugin/12626-orchide--ansible-language-support) version 2020.1.5.
 
 
@@ -21,7 +21,7 @@ OrchidE-Builder packages for Ansible 4.4.0, 20210816 and newer **require** at le
 
 To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 
-1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/latest) or a specific Ansible version  
+1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/latest) or a specific Ansible version
    * [11.2.0](https://github.com/tfroescher/orchide-builder/releases/11.2.0),
    [11.1.0](https://github.com/tfroescher/orchide-builder/releases/11.1.0),
    [11.0.0](https://github.com/tfroescher/orchide-builder/releases/11.0.0),
@@ -97,11 +97,11 @@ Any collection that documents the meta-information as Ansible can be used as a s
 * Bash
 * a Java (JDK) version 8 - 14
 * Apache Ant
-* Git (or download this repository) 
+* Git (or download this repository)
 
 ### Install CLI
 
-1. Install Python 3, bash, java, jq and Apache ant via your package manager 
+1. Install Python 3, bash, java, jq and Apache ant via your package manager
      * e.g for Fedora
          ```shell
          $ dnf install git ant pipenv jq
@@ -109,31 +109,74 @@ Any collection that documents the meta-information as Ansible can be used as a s
 1. Check out this repository
 1. Run
     ```shell
-    $ pipenv install 
+    $ pipenv install
      ```
     within the repository root folder
 
-### Usage 
+### Configure a galaxy authentication token if required
+
+If you would like to consume collections from
+https://console.redhat.com/ansible/automation-hub you need to provide
+a token.
+
+add the following to `ansible.cfg` in this directory:
+
+```
+[galaxy]
+server_list = automation_hub, release_galaxy
+
+[galaxy_server.automation_hub]
+url=https://console.redhat.com/api/automation-hub/
+auth_url=https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+token=<your token here>
+
+[galaxy_server.release_galaxy]
+url=https://galaxy.ansible.com/
+```
+
+For creating a token see [Creating the offline token in automation hub](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/managing_automation_content/managing-cert-valid-content#proc-create-api-token_cloud-sync).
+
+### Usage
 
 1. Configure the Ansible collection
 
-    1. Create a new configuration file from an existing one in the res folder 
+    1. Create a new configuration file from an existing one in the res folder
        * for the latest version, copy a file with *date version*
        * for a list of collections with specific version, copy a file with Ansible version
-    1. Add / remove collections you want 
+    1. Add / remove collections you want
 1. Run
     ```shell
-    $ ./build.sh build-4release -a <version number> 
-    $ ./build.sh build-4release -a 20210816 
-    ``` 
-   
-1. Copy the built jar (./build/dist/orchide-definitions.jar) to the OrchidE's configured extension directory. 
+    $ ./build.sh build-4release -a <version number>
+    $ ./build.sh build-4release -a 20210816
+    ```
+
+1. Copy the built jar (./build/dist/orchide-definitions.jar) to the OrchidE's configured extension directory.
    (set in Settings > Languages & Frameworks > OrchidE > Extension)
-   
+
+### Forcing a specific java version
+
+For example under Fedora if `ant` is installed from rpm, it might be
+necessary to force `ant` to use the right java version. Even if
+`/usr/bin/java` already points to the right version.
+
+For this to work have to set `JAVA_HOME` before calling `build.sh`:
+
+```
+export JAVA_HOME=/usr/lib/jvm/jre-11/lib
+```
+
+You can verify that `ant` is using the right java version (<= 14 see
+above) with
+
+```
+ant -diagnostics
+```
+
 ## Reporting Issues
 
-If you're missing an Ansible Galaxy collection, experience a problem or have any other issue, please file an issue.
-You can also reach out to me via [support@orchide.dev](mailto:support@orchide.dev). 
+If you're missing an Ansible Galaxy collection, experience a problem
+or have any other issue, please file an issue.  You can also reach out
+to me via [support@orchide.dev](mailto:support@orchide.dev).
 
 
 ## Acknowledgments
