@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-ansible-core="~=2.11"
+ansible-core="~=2.18"
 lxml = "*"
 "straight.plugin" = "*"
 jinja2 = "*"
