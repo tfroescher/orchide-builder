@@ -106,7 +106,7 @@ downloadCollections(){
       collection=${collectionDescriptor%%:*}
       if( [ $collection != "ansible.builtin" ] ); then
         echo "Installing collection $collectionDescriptor" | tee -a orchide-builder.log
-        ansible-galaxy collection install $collectionDescriptor &
+        ansible-galaxy collection install -f $collectionDescriptor &
         if [ $DL_COUNTER -lt 4 ]; then
           ((DL_COUNTER++))
         else
@@ -184,7 +184,6 @@ createModuleDefinitions(){
       echo "Processing collection $collectionDescriptor" | tee -a orchide-builder.log
       collection=${collectionDescriptor%%:*}
 
-      #loop über all colletions
       echo "Creating collection $collection" | tee -a orchide-builder.log
       mkdir -p $MODULES/$collection
       mkdir -p $PARSERS/$collection
@@ -254,12 +253,13 @@ createPlugins(){
 addResources(){
   cp -r $BASEDIR/src/main/resources/static/references/ansible-defaults $BASE/
   cp -r $BASEDIR/src/main/resources/static/references/inspections $BASE/
+  cp -r $BASEDIR/src/main/resources/static/schemas $BUILD/
   sed "s/CONTENT-VERSION/${ANSIBLE_VERSION}/g" $BASEDIR/src/main/resources/static/META-INF/orchide-builder-version.properties > $BUILD/META-INF/orchide-builder-version.properties
 }
 
 createJar(){
   echo "Creating jar ..." | tee -a orchide-builder.log
-  jar --create --file $BUILD/orchide-definitions.jar -C $BUILD META-INF -C $BUILD references
+  jar --create --file $BUILD/orchide-definitions.jar -C $BUILD META-INF -C $BUILD references -C $BUILD schemas
 }
 
 echo "Starting ..." | tee orchide-builder.log

@@ -37,13 +37,19 @@ Version V1 is *deprecated*.
 To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 
 1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/) as 
-   bundle in format [V2](https://github.com/tfroescher/orchide-builder/releases/20250421-v2) or [V1](https://github.com/tfroescher/orchide-builder/releases/latest)
+   bundle in format [V2](https://github.com/tfroescher/orchide-builder/releases/20250703-v2) or [V1](https://github.com/tfroescher/orchide-builder/releases/latest)
    or a specific Ansible version:
    - V2 bundles
-      * [11.4.0](https://github.com/tfroescher/orchide-builder/releases/11.4.0-v2),
+      * [11.7.0](https://github.com/tfroescher/orchide-builder/releases/11.7.0-v2),
+      [11.6.0](https://github.com/tfroescher/orchide-builder/releases/11.6.0-v2),
+      [11.5.0](https://github.com/tfroescher/orchide-builder/releases/11.5.0-v2),
+      [11.4.0](https://github.com/tfroescher/orchide-builder/releases/11.4.0-v2),
       [11.3.0](https://github.com/tfroescher/orchide-builder/releases/11.3.0-v2).
    - V1 bundles 
-      * [11.4.0](https://github.com/tfroescher/orchide-builder/releases/11.4.0),
+      * [11.7.0](https://github.com/tfroescher/orchide-builder/releases/11.7.0),
+      [11.6.0](https://github.com/tfroescher/orchide-builder/releases/11.6.0),
+      [11.5.0](https://github.com/tfroescher/orchide-builder/releases/11.5.0),
+      [11.4.0](https://github.com/tfroescher/orchide-builder/releases/11.4.0),
       [11.3.0](https://github.com/tfroescher/orchide-builder/releases/11.3.0),
       [11.2.0](https://github.com/tfroescher/orchide-builder/releases/11.2.0),
       [11.1.0](https://github.com/tfroescher/orchide-builder/releases/11.1.0),
