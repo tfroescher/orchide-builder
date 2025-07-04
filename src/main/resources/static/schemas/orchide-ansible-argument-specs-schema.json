@@ -106,7 +106,7 @@
     },
     "entry_point": {
       "additionalProperties": false,
-      "markdownDescription": "<ul><li>The name of the role entry point.</li><li>This should be main in the case of an unspecified entry point.</li><li>This will be the base name of the tasks file to execute, with no .yml or .yaml file extension.</li></ul>",
+      "x-intellij-html-description": "<ul><li>The name of the role entry point.</li><li>This should be main in the case of an unspecified entry point.</li><li>This will be the base name of the tasks file to execute, with no .yml or .yaml file extension.</li></ul>",
       "properties": {
         "attributes": {
           "additionalProperties": {
@@ -115,7 +115,7 @@
           "type": "object"
         },
         "author": {
-          "markdownDescription": "<ul><li>Name of the entry point authors.</li><li>This can be a single string or a list of strings. Use one list entry per author. If there is only a single author, use a string or a one-element list.</li></ul>",
+          "x-intellij-html-description": "<ul><li>Name of the entry point authors.</li><li>This can be a single string or a list of strings. Use one list entry per author. If there is only a single author, use a string or a one-element list.</li></ul>",
           "oneOf": [
             {
               "type": "string"
@@ -129,7 +129,7 @@
           ]
         },
         "description": {
-          "markdownDescription": "<ul><li>A longer description that may contain multiple lines.</li><li>This can be a single string or a list of strings. In case this is a list of strings, every list\nelement is a new paragraph.</li></ul>",
+          "x-intellij-html-description": "<ul><li>A longer description that may contain multiple lines.</li><li><strong>This can be a single string or a list of strings<strong>. In case this is a list of strings, every list\nelement is a new paragraph.</li></ul>",
           "oneOf": [
             {
               "type": "string"
@@ -146,6 +146,7 @@
           "type": "string"
         },
         "options": {
+          "x-intellij-html-description": "<ul><li><p>Options are often called “parameters” or “arguments”. This section defines those options.</p></li><li><p>For each role option (argument), you may include:</p></li></ul><dl><dt><strong>option-name:</strong></dt><dd><ul><li><p>The name of the option/argument.</p></li></ul></dd><dt><strong>description:</strong></dt><dd><ul><li><p>Detailed explanation of what this option does. It should be written in full sentences.</p></li><li><p>This can be a single string or a list of strings. In case this is a list of strings, every list element is a new paragraph.</p></li></ul></dd><dt><strong>version_added:</strong></dt><dd><ul><li><p>Only needed if this option was added after the initial role/entry point release. In other words, this is greater than the top level <code><span>version_added</span></code>field.</p></li><li><p>This is a string, and not a float, for example, <code><span class='pre'>version_added:</span> <span class='grayed'>'2.1'</span></code>.</p></li><li><p>In collections, this must be the collection version the option was added to. For example, <code><span>version_added:</span><span>1.0.0</span></code>.</p></li></ul></dd><dt><strong>type:</strong></dt><dd><ul><li><p>The data type of the option. See <a class='reference internal' href='../dev_guide/developing_program_flow_modules.html#argument-spec'><span class='std std-ref'>Argument spec</span></a>for allowed values for <code><span class='pre'>type</span></code>. The default is <code><span class='pre'>str</span></code>.</p></li><li><p>If an option is of type <code><span class='pre'>list</span></code>, <code><span class='pre'>elements</span></code> should be specified.</p></li></ul></dd><dt><strong>required:</strong></dt><dd><ul><li><p>Only needed if <code><span>true</span></code>.</p></li><li><p>If missing, the option is not required.</p></li></ul></dd><dt><strong>default:</strong></dt><dd><ul><li><p>If <code><span>required</span></code> is <code><span>false</span></code>/missing, <code><span>default</span></code> may be specified (assumed <code><span>null</span></code> if missing).</p></li><li><p>Ensure that the default value in the docs matches the default value in the code. The actual default for the role variable will always come from the role defaults (as defined in <a href='https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-directory-structure'><span>Role directory structure</span></a>).</p></li><li><p>The default field must not be listed as part of the description unless it requires additional information or conditions.</p></li><li><p>If the option is a boolean value, you should use <code><span>true</span></code>/<code><span>false</span></code> if you want to be compatible with <code><span>ansible-lint</span></code>.</p></li></ul></dd><dt><strong>choices:</strong></dt><dd><ul><li><p>List of option values.</p></li><li><p>Should be absent if empty.</p></li></ul></dd><dt><strong>elements:</strong></dt><dd><ul><li><p>Specifies the data type for list elements when the type is <code><span>list</span></code>.</p></li></ul></dd><dt><strong>options:</strong></dt><dd><ul><li><p>If this option takes a dict or list of dicts, you can define the structure here.</p></li></ul></dd></dl>\n",
           "additionalProperties": {
             "$ref": "#/$defs/option"
           },
@@ -217,11 +218,11 @@
           "type": "array"
         },
         "short_description": {
-          "markdownDescription": "<p>A short, one-line description of the entry point. Ideally, it is a phrase and not a sentence.</p><p>The <code>short_description</code> is displayed by ansible-doc -t role -l.</p>It also becomes part of the title for the role page in the documentation.<br/>The short description should always be a string and never a list, and should not end in a period.",
+          "x-intellij-html-description": "<p>A short, one-line description of the entry point. Ideally, it is a phrase and not a sentence.</p><p>The <code>short_description</code> is displayed by ansible-doc -t role -l.</p>It also becomes part of the title for the role page in the documentation.<br/>The short description should always be a string and never a list, and should not end in a period.",
           "type": "string"
         },
         "version_added": {
-          "markdownDescription": "<ul><li>The version of the role when the entrypoint was added.<li></li>This is a string, and not a float, for example, <code>version_added: '2.1'</code>..<li></li>In collections, this must be the collection version the entrypoint was added to. For example, version_added: 1.0.0.</li></ul>",
+          "x-intellij-html-description": "<ul><li>The version of the role when the entrypoint was added.<li></li>This is a string, and not a float, for example, <code>version_added: '2.1'</code>..<li></li>In collections, this must be the collection version the entrypoint was added to. For example, version_added: 1.0.0.</li></ul>",
           "type": "string"
         }
       },
@@ -237,11 +238,11 @@
       "markdownDescription": "See [argument-spec](https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec)",
       "properties": {
         "apply_defaults": {
-          "markdownDescription": "<p><code>apply_defaults</code> works alongside <code>options</code> and allows the <code>default</code> of the sub-options to be applied even when the top-level argument is not supplied.</p><p>In the example of the <code>argument_spec</code> at the top of this section, it would allow <code>module.params['top_level']['second_level']</code> to be defined, even if the user does not provide <code>top_level</code> when calling the module.</p>\n",
+          "x-intellij-html-description": "<p><code>apply_defaults</code> works alongside <code>options</code> and allows the <code>default</code> of the sub-options to be applied even when the top-level argument is not supplied.</p><p>In the example of the <code>argument_spec</code> at the top of this section, it would allow <code>module.params['top_level']['second_level']</code> to be defined, even if the user does not provide <code>top_level</code> when calling the module.</p>\n",
           "type": "string"
         },
         "choices": {
-          "markdownDescription": "<p><code>choices</code> accepts a list of choices that the argument will accept. The types of <code>choices</code> should match the <code>type</code>.</p>",
+          "x-intellij-html-description": "<p><code>choices</code> accepts a list of choices that the argument will accept. The types of <code>choices</code> should match the <code>type</code>.</p>",
           "oneOf": [
             {
               "type": "array"
@@ -254,7 +255,7 @@
         },
         "default": {
           "default": "None",
-          "markdownDescription": "<p>The <code>default</code> option allows sets a default value for the argument for the scenario when the argument is not provided to the module. When not specified, the default value is <code>None</code>.</p>"
+          "x-intellij-html-description": "<p>The <code>default</code> option allows sets a default value for the argument for the scenario when the argument is not provided to the module. When not specified, the default value is <code>None</code>.</p>"
         },
         "description": {
           "description": "Detailed explanation of what this option does. It should be written in full sentences.",
@@ -272,17 +273,17 @@
         },
         "elements": {
           "$ref": "#/$defs/datatype",
-          "markdownDescription": "<p><code>elements</code> works in combination with <code>type</code> when <code>type='list'</code>. <code>elements</code> can then be defined as <code>elements='int'</code> or any other type, indicating that each element of the specified list should be of that type.</p>\n"
+          "x-intellij-html-description": "<p><code>elements</code> works in combination with <code>type</code> when <code>type='list'</code>. <code>elements</code> can then be defined as <code>elements='int'</code> or any other type, indicating that each element of the specified list should be of that type.</p>\n"
         },
         "fallback": {
           "default": "None",
           "type": "string",
-          "markdownDescription": "<p><code>fallback</code> accepts a <code>tuple</code> where the first argument is a callable (function) that will be used to perform the lookup, based on the second argument. The second argument is a list of values to be accepted by the callable.</p><p>The most common callable used is <code>env_fallback</code> which will allow an argument to optionally use an environment variable when the argument is not supplied.</p><p>Example:</p><p><code><span>username=dict(fallback=(env_fallback, ['ANSIBLE_NET_USERNAME']))</span></code></p>"
+          "x-intellij-html-description": "<p><code>fallback</code> accepts a <code>tuple</code> where the first argument is a callable (function) that will be used to perform the lookup, based on the second argument. The second argument is a list of values to be accepted by the callable.</p><p>The most common callable used is <code>env_fallback</code> which will allow an argument to optionally use an environment variable when the argument is not supplied.</p><p>Example:</p><p><code><span>username=dict(fallback=(env_fallback, ['ANSIBLE_NET_USERNAME']))</span></code></p>"
         },
         "no_log": {
           "default": false,
           "type": "boolean",
-          "markdownDescription": "<p><code>no_log</code> accepts a boolean, either <code>True</code> or <code>False</code>, that indicates explicitly whether or not the argument value should be masked in logs and output.</p>"
+          "x-intellij-html-description": "<p><code>no_log</code> accepts a boolean, either <code>True</code> or <code>False</code>, that indicates explicitly whether or not the argument value should be masked in logs and output.</p>"
         },
         "option-name": {
           "description": "The name of the option/argument.",
@@ -293,15 +294,15 @@
             "$ref": "#/$defs/option"
           },
           "type": "object",
-          "markdownDescription": "<p><code>options</code> implements the ability to create a sub-argument_spec, where the sub options of the top level argument are also validated using the attributes discussed in this section. The example at the top of this section demonstrates use of <code>options</code>. <code>type</code> or <code>elements</code> should be <code>dict</code> is this case.</p>"
+          "x-intellij-html-description": "<p><code>options</code> implements the ability to create a sub-argument_spec, where the sub options of the top level argument are also validated using the attributes discussed in this section. The example at the top of this section demonstrates use of <code>options</code>. <code>type</code> or <code>elements</code> should be <code>dict</code> is this case.</p>"
         },
         "required": {
           "default": false,
           "type": "boolean",
-          "markdownDescription": "<p><code>required</code> accepts a boolean, either <code>True</code> or <code>False</code> that indicates that the argument is required. When not specified, <code>required</code> defaults to <code>False</code>. This should not be used in combination with <code>default</code>.</p>"
+          "x-intellij-html-description": "<p><code>required</code> accepts a boolean, either <code>True</code> or <code>False</code> that indicates that the argument is required. When not specified, <code>required</code> defaults to <code>False</code>. This should not be used in combination with <code>default</code>.</p>"
         },
         "mutually_exclusive": {
-          "markdownDescription": "<p>If <code>options</code> is specified, <code>mutually_exclusive</code> refers to the sub-options described in <code>options</code> and behaves as in <a href=\"https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec-dependencies\">Dependencies between module options</a>.</p>",
+          "x-intellij-html-description": "<p>If <code>options</code> is specified, <code>mutually_exclusive</code> refers to the sub-options described in <code>options</code> and behaves as in <a href='https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec-dependencies'>Dependencies between module options</a>.</p>",
           "type": "array",
           "items": {
             "items": {
@@ -310,7 +311,7 @@
           }
         },
         "required_together": {
-          "markdownDescription": "<p>If <code>options</code> is specified, <code>required_together</code> refers to the sub-options described in <code>options</code> and behaves as in <a href=\"https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec-dependencies\">Dependencies between module options</a>.</p>",
+          "x-intellij-html-description": "<p>If <code>options</code> is specified, <code>required_together</code> refers to the sub-options described in <code>options</code> and behaves as in <a href='https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec-dependencies'>Dependencies between module options</a>.</p>",
           "type": "array",
           "items": {
             "type": "array",
@@ -320,7 +321,7 @@
           }
         },
         "required_one_of": {
-          "markdownDescription": "<p>If <code>options</code> is specified, <code>required_one_of</code> refers to the sub-options described in <code>options</code> and behaves as in <a href=\"https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec-dependencies\">Dependencies between module options</a>.</p>",
+          "x-intellij-html-description": "<p>If <code>options</code> is specified, <code>required_one_of</code> refers to the sub-options described in <code>options</code> and behaves as in <a href='https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec-dependencies'>Dependencies between module options</a>.</p>",
           "type": "array",
           "items": {
             "items": {
@@ -329,7 +330,7 @@
           }
         },
         "required_if": {
-          "markdownDescription": "<p>If <code>options</code> is specified, <code>required_if</code> refers to the sub-options described in <code>options</code> and behaves as in <a href=\"https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec-dependencies\">Dependencies between module options</a>.</p>",
+          "x-intellij-html-description": "<p>If <code>options</code> is specified, <code>required_if</code> refers to the sub-options described in <code>options</code> and behaves as in <a href='https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec-dependencies'>Dependencies between module options</a>.</p>",
           "type": "array",
           "items": {
             "type": "array",
@@ -353,7 +354,7 @@
           }
         },
         "required_by": {
-          "markdownDescription": "<p>If <code>options</code> is specified, <code>required_by</code> refers to the sub-options described in <code>options</code> and behaves as in <a href=\"https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec-dependencies\">Dependencies between module options</a>.</p>",
+          "x-intellij-html-description": "<p>If <code>options</code> is specified, <code>required_by</code> refers to the sub-options described in <code>options</code> and behaves as in <a href='https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec-dependencies'>Dependencies between module options</a>.</p>",
           "type": "object",
           "additionalProperties": {
             "oneOf": [
@@ -371,10 +372,10 @@
         },
         "type": {
           "$ref": "#/$defs/datatype",
-          "markdownDescription": "<p><code>type</code> allows you to define the type of the value accepted for the argument. The default value for <code>type</code> is <code>str</code>. Possible values are:</p><ul><li><p>str</p></li><li><p>list</p></li><li><p>dict</p></li><li><p>bool</p></li><li><p>int</p></li><li><p>float</p></li><li><p>path</p></li><li><p>raw</p></li><li><p>jsonarg</p></li><li><p>json</p></li><li><p>bytes</p></li><li><p>bits</p></li></ul><p>The <code>raw</code> type, performs no type validation or type casting, and maintains the type of the passed value.</p><p>See also [argument-spec](https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec)</p>"
+          "x-intellij-html-description": "<p><code>type</code> allows you to define the type of the value accepted for the argument. The default value for <code>type</code> is <code>str</code>. Possible values are:</p><ul><li><p>str</p></li><li><p>list</p></li><li><p>dict</p></li><li><p>bool</p></li><li><p>int</p></li><li><p>float</p></li><li><p>path</p></li><li><p>raw</p></li><li><p>jsonarg</p></li><li><p>json</p></li><li><p>bytes</p></li><li><p>bits</p></li></ul><p>The <code>raw</code> type, performs no type validation or type casting, and maintains the type of the passed value.</p><p>See also <a href='https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec'>argument-spec</a></p>"
         },
         "version_added": {
-          "markdownDescription": "<ul><li>Only needed if this option was added after the initial role/entry point release. In other words, this is greater than the top level version_added field.</li><li>This is a string, and not a float, for example, version_added: '2.1'.</li><li>In collections, this must be the collection version the option was added to. For example, version_added: 1.0.0.</li></ul>",
+          "x-intellij-html-description": "<ul><li>Only needed if this option was added after the initial role/entry point release. In other words, this is greater than the top level version_added field.</li><li>This is a string, and not a float, for example, version_added: '2.1'.</li><li>In collections, this must be the collection version the option was added to. For example, version_added: 1.0.0.</li></ul>",
           "type": "string"
         }
       },
@@ -400,7 +401,8 @@
       "additionalProperties": {
         "$ref": "#/$defs/entry_point"
       },
-      "markdownDescription": "<p>The role argument specification must be defined in a top-level argument_specs block within the role meta/argument_specs.yml file. All fields are lowercase.</p><p>Add entry point, usually `main`.</p>See [role-argument-validation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)"
+      "x-intellij-html-description": "<p>The role argument specification must be defined in a top-level argument_specs block within the role meta/argument_specs.yml file. All fields are lowercase.</p><p>Add entry point, usually `main`.</p>See <a href='https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation'>role-argument-validation</a>",
+      "markdownDescription": "Add entry point, usually `main`.\nSee [role-argument-validation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)"
     }
   },
   "title": "Ansible Role Argument Specs Schema"
