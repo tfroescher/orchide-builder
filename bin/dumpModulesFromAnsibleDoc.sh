@@ -217,8 +217,8 @@ updateVersionReferences(){
    colOldVersion=$(cat $BASEDIR/version_references.properties | grep $col | sed 's/.*=//g' )
    updated=""
    # ignore removed collections
-   if [ $colOldVersion != '$colOldVersion' ] ; then
-     if [ $colOldVersion != $colNewVersion ] ; then
+   if [ "$colOldVersion" != "$colOldVersion" ] ; then
+     if [ "$colOldVersion" != "$colNewVersion" ] ; then
         updated=" (updated from $colOldVersion)"
      fi
    fi
@@ -278,5 +278,3 @@ createPlugins
 addResources
 
 createJar
-
-
