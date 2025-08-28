@@ -107,6 +107,9 @@ downloadCollections(){
       if( [ $collection != "ansible.builtin" ] ); then
         echo "Installing collection $collectionDescriptor" | tee -a orchide-builder.log
         ansible-galaxy collection install -f $collectionDescriptor &
+        if [ $? -eq 1 ]; then
+          echo "Downloading collection $collectionDescriptor failed. (ansible-galaxy collection install -f $collectionDescriptor)" | tee -a orchide-builder-error.log
+        fi
         if [ $DL_COUNTER -lt 4 ]; then
           ((DL_COUNTER++))
         else
@@ -122,16 +125,22 @@ createDefinition(){
     local col=$1
     echo "Creating modules for collection $col" | tee -a orchide-builder.log
     sleep 0.2
-    ansible-doc -t module $col --metadata-dump | jq .all.module | \
-      jq 'to_entries | map({(.key): (if .value.doc.deprecated != null then {deprecated: (.value.doc.deprecated + {state: true})} else {} +{ deprecated: {state: false }} end +{"short_description": (.value.doc.short_description)} ) }) | add' \
-      >  $PARSERS/${col}/_list_of_all_modules.json
+    hasCollections=$(ansible-doc -t module $col -l)
+    #echo "================================= ${hasCollections}"
+    if [ -n "${hasCollections}" ]; then
+      ansible-doc -t module $col --metadata-dump | jq .all.module | \
+        jq 'to_entries | map({(.key): (if .value.doc.deprecated != null then {deprecated: (.value.doc.deprecated + {state: true})} else {} +{ deprecated: {state: false }} end +{"short_description": (.value.doc.short_description)} ) }) | add' \
+        >  $PARSERS/${col}/_list_of_all_modules.json
 
-
-    ansible-doc -t module $col --metadata-dump | jq .all.module | jq -r 'to_entries' | jq -c '.[]' | while read -r col_module; do
-      fqcn=$(echo "$col_module" | jq -r '.key')
-      name=${fqcn##*.}
-      echo "$col_module" | jq '{(.key): .value} | walk(if type == "object" then del(.filename) else . end)' >  ${MODULES}/${col}/${name}.json
-    done
+      ansible-doc -t module $col --metadata-dump | jq .all.module | jq -r 'to_entries' | jq -c '.[]' | while read -r col_module; do
+        fqcn=$(echo "$col_module" | jq -r '.key')
+        name=${fqcn##*.}
+        echo "$col_module" | jq '{(.key): .value} | walk(if type == "object" then del(.filename) else . end)' >  ${MODULES}/${col}/${name}.json
+      done
+    else
+      echo "{}" > $PARSERS/${col}/_list_of_all_modules.json
+      echo "ERROR/WARNING: $col has no modules, it will be included as an empty list in the OrchidE builder definition file." | tee -a orchide-builder-error.log
+    fi
 
 }
 
@@ -190,9 +199,14 @@ createModuleDefinitions(){
 
       # Update collections.json
       collectionDefinition=$(ansible-galaxy collection list --format json ${collection} | jq -c 'to_entries | .[].value ')
+      if [ -z "${collectionDefinition}" ] ; then
+        echo "ERROR/WARNING: ${collection} is either not available or has no modules. (ansible-galaxy collection list --format json ${collection})." | tee -a orchide-builder-error.log
+        collectionDefinition="{\"${collection}\":{\"version\":\"0.0.0\"}}"
+      fi
+      colVersion=$(echo "$collectionDefinition" | jq -r 'to_entries[0].value.version')
+      echo "Adding collection $collection $colVersion ..." | tee -a orchide-builder.log
       jq ". += ${collectionDefinition}" $BASE/collections.json > $BUILD/collections-tmp.json
       mv $BUILD/collections-tmp.json $BASE/collections.json
-
       updateVersionReferences $collection "$collectionDefinition"
 
       wait_for_slot
@@ -209,16 +223,16 @@ updateVersionReferences(){
    local col=$1
    local colDefinition=$2
 
-   echo "$colDefinition"
+   echo "Parsing $colDefinition ..."
    colNewVersion=$(echo "$colDefinition" | jq -r 'to_entries[0].value.version')
-   echo "Creating version $colNewVersion" | tee -a orchide-builder.log
+   echo "Creating $col version $colNewVersion" | tee -a orchide-builder.log
    echo "$col=$colNewVersion" >> $BUILD/version_references.properties
 
    colOldVersion=$(cat $BASEDIR/version_references.properties | grep $col | sed 's/.*=//g' )
    updated=""
    # ignore removed collections
-   if [ $colOldVersion != '$colOldVersion' ] ; then
-     if [ $colOldVersion != $colNewVersion ] ; then
+   if [ "$colOldVersion" != '$colOldVersion' ] ; then
+     if [ "$colOldVersion" != "$colNewVersion" ] ; then
         updated=" (updated from $colOldVersion)"
      fi
    fi
