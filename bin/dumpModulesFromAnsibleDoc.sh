@@ -33,6 +33,25 @@ cat << EOF
 EOF
 }
 
+errorDuplicateCollection(){
+  local col=$1
+cat << EOF
+
+  ========================================
+                  ERROR
+  ========================================
+
+   Unsupported environment found.
+
+   Ansible Galaxy command found more than one collection version
+   for collection $col.
+
+   Ensure that no system ansbile packages are used. (I.e. from python's site-packages)
+   Either uninstall these packages or use a virtual envrionment to use OrchidE builder.
+
+
+EOF
+}
 
 
 if [ $# == 0 ]; then
@@ -126,7 +145,6 @@ createDefinition(){
     echo "Creating modules for collection $col" | tee -a orchide-builder.log
     sleep 0.2
     hasCollections=$(ansible-doc -t module $col -l)
-    #echo "================================= ${hasCollections}"
     if [ -n "${hasCollections}" ]; then
       ansible-doc -t module $col --metadata-dump | jq .all.module | \
         jq 'to_entries | map({(.key): (if .value.doc.deprecated != null then {deprecated: (.value.doc.deprecated + {state: true})} else {} +{ deprecated: {state: false }} end +{"short_description": (.value.doc.short_description)} ) }) | add' \
@@ -198,7 +216,13 @@ createModuleDefinitions(){
       mkdir -p $PARSERS/$collection
 
       # Update collections.json
-      collectionDefinition=$(ansible-galaxy collection list --format json ${collection} | jq -c 'to_entries | .[].value ')
+      galaxyCollectionDefinition=$(ansible-galaxy collection list --format json ${collection})
+      collectionDefinitionLength=$(echo $galaxyCollectionDefinition | jq -c '. | length')
+      if [ "$collectionDefinitionLength" -gt 1 ]; then
+        errorDuplicateCollection $collection
+        exit 9
+      fi
+      collectionDefinition=$(echo $galaxyCollectionDefinition | jq -c 'to_entries | .[].value ')
       if [ -z "${collectionDefinition}" ] ; then
         echo "ERROR/WARNING: ${collection} is either not available or has no modules. (ansible-galaxy collection list --format json ${collection})." | tee -a orchide-builder-error.log
         collectionDefinition="{\"${collection}\":{\"version\":\"0.0.0\"}}"

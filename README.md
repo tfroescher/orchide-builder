@@ -127,12 +127,19 @@ Any collection that documents the meta-information as Ansible can be used as a s
 * Java (JDK)
 * jq 
 
+**Important note**
+
+The OrchidE builder can only bundle one version per Ansible collection. 
+To prevent duplicate collections being used, a Python virtual environment should be set up. 
+If using a system-installed Ansible package, make sure that no other Ansible collections are installed. 
+(For example, via the system package manager or within Python's site-packages.)
+
 ### Install CLI
 
 1. Install Python 3, bash, java and jq via your package manager
    * e.g for Fedora
        ```shell
-       $ dnf install git ant pipenv jq
+       $ dnf install java-latest-openjdk-devel git pipenv jq
        ```
 1. Check out this repository
 1. Run
