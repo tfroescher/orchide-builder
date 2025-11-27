@@ -40,6 +40,9 @@ To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
    bundle in format [V2](https://github.com/tfroescher/orchide-builder/releases/20250703-v2) or [V1](https://github.com/tfroescher/orchide-builder/releases/latest)
    or a specific Ansible version:
    - V2 bundles
+      * [12.2.0](https://github.com/tfroescher/orchide-builder/releases/12.2.0-v2),
+      [12.1.0](https://github.com/tfroescher/orchide-builder/releases/12.1.0-v2),
+      [12.0.0](https://github.com/tfroescher/orchide-builder/releases/12.0.0-v2),
       * [11.7.0](https://github.com/tfroescher/orchide-builder/releases/11.7.0-v2),
       [11.6.0](https://github.com/tfroescher/orchide-builder/releases/11.6.0-v2),
       [11.5.0](https://github.com/tfroescher/orchide-builder/releases/11.5.0-v2),
