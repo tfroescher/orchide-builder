@@ -37,19 +37,22 @@ Version V1 is *deprecated*.
 To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 
 1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/) as 
-   bundle in format [V2](https://github.com/tfroescher/orchide-builder/releases/20250703-v2) or [V1](https://github.com/tfroescher/orchide-builder/releases/latest)
+   a bundle in format [V2](https://github.com/tfroescher/orchide-builder/releases/20250703-v2) or [V1](https://github.com/tfroescher/orchide-builder/releases/latest)
    or a specific Ansible version:
    - V2 bundles
       * [12.2.0](https://github.com/tfroescher/orchide-builder/releases/12.2.0-v2),
       [12.1.0](https://github.com/tfroescher/orchide-builder/releases/12.1.0-v2),
       [12.0.0](https://github.com/tfroescher/orchide-builder/releases/12.0.0-v2),
-      * [11.7.0](https://github.com/tfroescher/orchide-builder/releases/11.7.0-v2),
+      * [11.9.0](https://github.com/tfroescher/orchide-builder/releases/11.9.0-v2),
+      [11.8.0](https://github.com/tfroescher/orchide-builder/releases/11.8.0-v2),
+      [11.7.0](https://github.com/tfroescher/orchide-builder/releases/11.7.0-v2),
       [11.6.0](https://github.com/tfroescher/orchide-builder/releases/11.6.0-v2),
       [11.5.0](https://github.com/tfroescher/orchide-builder/releases/11.5.0-v2),
       [11.4.0](https://github.com/tfroescher/orchide-builder/releases/11.4.0-v2),
       [11.3.0](https://github.com/tfroescher/orchide-builder/releases/11.3.0-v2).
    - V1 bundles 
-      * [11.7.0](https://github.com/tfroescher/orchide-builder/releases/11.7.0),
+      * [11.9.0](https://github.com/tfroescher/orchide-builder/releases/11.9.0),
+      [11.7.0](https://github.com/tfroescher/orchide-builder/releases/11.7.0),
       [11.6.0](https://github.com/tfroescher/orchide-builder/releases/11.6.0),
       [11.5.0](https://github.com/tfroescher/orchide-builder/releases/11.5.0),
       [11.4.0](https://github.com/tfroescher/orchide-builder/releases/11.4.0),
