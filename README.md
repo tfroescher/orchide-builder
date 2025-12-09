@@ -37,7 +37,7 @@ Version V1 is *deprecated*.
 To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 
 1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/) as 
-   a bundle in format [V2](https://github.com/tfroescher/orchide-builder/releases/20250703-v2) or [V1](https://github.com/tfroescher/orchide-builder/releases/latest)
+   a bundle in format [V2](https://github.com/tfroescher/orchide-builder/releases/20251209-v2) or [V1](https://github.com/tfroescher/orchide-builder/releases/latest)
    or a specific Ansible version:
    - V2 bundles
       * [12.2.0](https://github.com/tfroescher/orchide-builder/releases/12.2.0-v2),
