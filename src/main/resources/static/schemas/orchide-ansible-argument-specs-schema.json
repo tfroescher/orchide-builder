@@ -1,5 +1,5 @@
 {
-  "date": "2025-06-09",
+  "date": "2025-12-09",
   "$defs": {
     "attribute": {
       "additionalProperties": false,
@@ -235,7 +235,7 @@
     },
     "option": {
       "additionalProperties": false,
-      "markdownDescription": "See [argument-spec](https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec)",
+      "markdownDescription": "See [argument-spec](https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec)",
       "properties": {
         "apply_defaults": {
           "x-intellij-html-description": "<p><code>apply_defaults</code> works alongside <code>options</code> and allows the <code>default</code> of the sub-options to be applied even when the top-level argument is not supplied.</p><p>In the example of the <code>argument_spec</code> at the top of this section, it would allow <code>module.params['top_level']['second_level']</code> to be defined, even if the user does not provide <code>top_level</code> when calling the module.</p>\n",
@@ -372,7 +372,7 @@
         },
         "type": {
           "$ref": "#/$defs/datatype",
-          "x-intellij-html-description": "<p><code>type</code> allows you to define the type of the value accepted for the argument. The default value for <code>type</code> is <code>str</code>. Possible values are:</p><ul><li><p>str</p></li><li><p>list</p></li><li><p>dict</p></li><li><p>bool</p></li><li><p>int</p></li><li><p>float</p></li><li><p>path</p></li><li><p>raw</p></li><li><p>jsonarg</p></li><li><p>json</p></li><li><p>bytes</p></li><li><p>bits</p></li></ul><p>The <code>raw</code> type, performs no type validation or type casting, and maintains the type of the passed value.</p><p>See also <a href='https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec'>argument-spec</a></p>"
+          "markdownDescription": "See [argument-spec](https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec"
         },
         "version_added": {
           "x-intellij-html-description": "<ul><li>Only needed if this option was added after the initial role/entry point release. In other words, this is greater than the top level version_added field.</li><li>This is a string, and not a float, for example, version_added: '2.1'.</li><li>In collections, this must be the collection version the option was added to. For example, version_added: 1.0.0.</li></ul>",
@@ -395,14 +395,13 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "additionalProperties": false,
   "examples": ["meta/argument_specs.yml"],
-  "markdownDescription": "See [role-argument-validation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)",
+  "markdownDescription": "See [role-argument-validation](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)",
   "properties": {
     "argument_specs": {
       "additionalProperties": {
         "$ref": "#/$defs/entry_point"
       },
-      "x-intellij-html-description": "<p>The role argument specification must be defined in a top-level argument_specs block within the role meta/argument_specs.yml file. All fields are lowercase.</p><p>Add entry point, usually `main`.</p>See <a href='https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation'>role-argument-validation</a>",
-      "markdownDescription": "Add entry point, usually `main`.\nSee [role-argument-validation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)"
+      "markdownDescription": "Add entry point, usually `main`.\nSee [role-argument-validation](https://docs.ansible.com/projects/ansible/latest/user_guide/playbooks_reuse_roles.html#role-argument-validation)"
     }
   },
   "title": "Ansible Role Argument Specs Schema"
