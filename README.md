@@ -37,13 +37,24 @@ Version V1 is *deprecated*.
 To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 
 1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/) as 
-   a bundle in format [V2](https://github.com/tfroescher/orchide-builder/releases/20251209-v2) or [V1](https://github.com/tfroescher/orchide-builder/releases/latest)
+   a bundle in format [V2](https://github.com/tfroescher/orchide-builder/releases/20260330-v2) or [V1](https://github.com/tfroescher/orchide-builder/releases/latest)
    or a specific Ansible version:
    - V2 bundles
-      * [12.2.0](https://github.com/tfroescher/orchide-builder/releases/12.2.0-v2),
+      * [13.5.0](https://github.com/tfroescher/orchide-builder/releases/13.5.0-v2),
+      [13.4.0](https://github.com/tfroescher/orchide-builder/releases/13.4.0-v2),
+      [13.3.0](https://github.com/tfroescher/orchide-builder/releases/13.3.0-v2),
+      [13.2.0](https://github.com/tfroescher/orchide-builder/releases/13.2.0-v2),
+      [13.1.0](https://github.com/tfroescher/orchide-builder/releases/13.1.0-v2),
+      [13.0.0](https://github.com/tfroescher/orchide-builder/releases/13.0.0-v2),
+      * [12.3.0](https://github.com/tfroescher/orchide-builder/releases/12.3.0-v2),
+      [12.2.0](https://github.com/tfroescher/orchide-builder/releases/12.2.0-v2),
       [12.1.0](https://github.com/tfroescher/orchide-builder/releases/12.1.0-v2),
       [12.0.0](https://github.com/tfroescher/orchide-builder/releases/12.0.0-v2),
-      * [11.9.0](https://github.com/tfroescher/orchide-builder/releases/11.9.0-v2),
+      * [11.13.0](https://github.com/tfroescher/orchide-builder/releases/11.13.0-v2),
+      [11.12.0](https://github.com/tfroescher/orchide-builder/releases/11.12.0-v2),
+      [11.11.0](https://github.com/tfroescher/orchide-builder/releases/11.11.0-v2),
+      [11.10.0](https://github.com/tfroescher/orchide-builder/releases/11.10.0-v2),
+      [11.9.0](https://github.com/tfroescher/orchide-builder/releases/11.9.0-v2),
       [11.8.0](https://github.com/tfroescher/orchide-builder/releases/11.8.0-v2),
       [11.7.0](https://github.com/tfroescher/orchide-builder/releases/11.7.0-v2),
       [11.6.0](https://github.com/tfroescher/orchide-builder/releases/11.6.0-v2),

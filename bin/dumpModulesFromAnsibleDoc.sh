@@ -1,6 +1,7 @@
 #!/bin/sh
 #
 #
+set -o pipefail
 
 TOOLDIR="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
 BASEDIR=${TOOLDIR}/..
@@ -11,6 +12,8 @@ PARSERS=$BASE/module/parsers
 MODULES=$BASE/module/modules
 PLUGINS=$BASE/plugins
 TMP=$BUILD/tmp
+COLLECTIONSDIR=$BUILD/collections/ansible_collections
+
 CORE_COUNTER=8
 
 export ANSIBLE_CONFIG=${BASEDIR}/ansible.cfg
@@ -125,11 +128,14 @@ downloadCollections(){
       collection=${collectionDescriptor%%:*}
       if( [ $collection != "ansible.builtin" ] ); then
         echo "Installing collection $collectionDescriptor" | tee -a orchide-builder.log
-        ansible-galaxy collection install -f $collectionDescriptor &
-        if [ $? -eq 1 ]; then
-          echo "Downloading collection $collectionDescriptor failed. (ansible-galaxy collection install -f $collectionDescriptor)" | tee -a orchide-builder-error.log
-        fi
+        {
+          ansible-galaxy collection install -f $collectionDescriptor
+          if [ $? -eq 1 ]; then
+            echo "ERROR: Downloading collection $collectionDescriptor failed. (ansible-galaxy collection install -f $collectionDescriptor)" | tee -a orchide-builder-error.log
+          fi
+        } &
         if [ $DL_COUNTER -lt 4 ]; then
+          sleep 0.05
           ((DL_COUNTER++))
         else
           wait
@@ -140,21 +146,56 @@ downloadCollections(){
   fi
 }
 
+checkDownloads(){
+  while IFS= read -r collectionDescriptor; do
+    # Ignore lines that start with #
+    if echo "${collectionDescriptor}" | grep -qE '^\s*#'; then
+      continue
+    fi
+
+    if echo "${collectionDescriptor}" | grep -qE '^$'; then
+      continue
+    fi
+
+    # Process the line (for example, print it or use it in a command)
+    collection=${collectionDescriptor%%:*}
+    if( [ "$collection" != "ansible.builtin" ] ); then
+      collectionFolder="${collection//.//}"
+      if [[ ! -e $COLLECTIONSDIR/$collectionFolder ]] ; then
+        echo "ERROR: Collection $collection not found in collections folder."
+        echo
+        exit 2
+      else
+        echo "Collection $collection found."
+      fi
+    fi
+  done < "$INPUT_COLLECTIONS"
+}
+
 createDefinition(){
     local col=$1
     echo "Creating modules for collection $col" | tee -a orchide-builder.log
-    sleep 0.2
+    sleep 0.1
     hasCollections=$(ansible-doc -t module $col -l)
     if [ -n "${hasCollections}" ]; then
       ansible-doc -t module $col --metadata-dump | jq .all.module | \
         jq 'to_entries | map({(.key): (if .value.doc.deprecated != null then {deprecated: (.value.doc.deprecated + {state: true})} else {} +{ deprecated: {state: false }} end +{"short_description": (.value.doc.short_description)} ) }) | add' \
         >  $PARSERS/${col}/_list_of_all_modules.json
-
+      if [ $? -ne 0 ] ; then
+        echo "ERROR: Could not dump ansible documentation for collection $col" | tee -a orchide-builder.log
+        touch $TMP/error.txt
+        return 1
+      fi
       ansible-doc -t module $col --metadata-dump | jq .all.module | jq -r 'to_entries' | jq -c '.[]' | while read -r col_module; do
         fqcn=$(echo "$col_module" | jq -r '.key')
         name=${fqcn##*.}
         echo "$col_module" | jq '{(.key): .value} | walk(if type == "object" then del(.filename) else . end)' >  ${MODULES}/${col}/${name}.json
       done
+      if [ $? -ne 0 ] ; then
+        echo "ERROR: Could not dump ansible documentation to create module documentation for $col" | tee -a orchide-builder.log
+        touch $TMP/error.txt
+        return 1
+      fi
     else
       echo "{}" > $PARSERS/${col}/_list_of_all_modules.json
       echo "ERROR/WARNING: $col has no modules, it will be included as an empty list in the OrchidE builder definition file." | tee -a orchide-builder-error.log
@@ -195,6 +236,17 @@ wait_for_slot() {
     done
 }
 
+finishOnError(){
+  if [ -f $TMP/error.txt ] ; then
+    while [ $(jobs -r | wc -l) -gt 0 ]; do
+      sleep 1
+    done
+
+    echo "ERROR: Fatal error, see above for a more detailed message."
+    exit 2
+  fi
+}
+
 createModuleDefinitions(){
   if [ ${CREATE_MODULES} == "true" ]; then
     echo '{}' > $BASE/collections.json
@@ -208,6 +260,9 @@ createModuleDefinitions(){
         echo "Ignoring commented collection $collectionDescriptor"
         continue
       fi
+
+      finishOnError
+
       echo "Processing collection $collectionDescriptor" | tee -a orchide-builder.log
       collection=${collectionDescriptor%%:*}
 
@@ -234,10 +289,14 @@ createModuleDefinitions(){
       updateVersionReferences $collection "$collectionDefinition"
 
       wait_for_slot
-      sleep 0.2
+      sleep 0.05
       createDefinition $collection &
 
     done < "$INPUT_COLLECTIONS"
+
+    finishOnError
+
+
     # Sort collections
     jq 'to_entries | sort_by(.key)| from_entries' $BASE/collections.json > $BUILD/collections-tmp.json
     mv $BUILD/collections-tmp.json $BASE/collections.json
@@ -304,9 +363,18 @@ echo "Starting ..." | tee orchide-builder.log
 
 DL_COUNTER=0
 
-downloadCollections
-createAnsibleBuiltinModules
+ansible --version 2> /dev/null
+if [ $? -ne 0 ] ; then
+  echo "Error: ansible not found. Setup an Ansible python environment."
+  exit 1
+fi
 
+rm -f $TMP/error.txt
+
+downloadCollections
+checkDownloads
+
+createAnsibleBuiltinModules
 
 createModuleDefinitions
 wait
