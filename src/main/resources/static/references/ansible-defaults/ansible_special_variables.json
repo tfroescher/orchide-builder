@@ -1,0 +1,568 @@
+{
+    "ansible_check_mode": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Boolean that indicates if we are in check mode or not",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_collection_name": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The name of the collection the task that is executing is a part of. In the format of C(namespace.collection)",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_config_file": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The full path of used Ansible configuration file",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_dependent_role_names": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The names of the roles currently imported into the current play as dependencies of other plays",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_diff_mode": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Boolean that indicates if we are in diff mode or not",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_forks": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Integer reflecting the number of maximum forks available to this run",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_index_var": {
+        "doc": {
+            "version": "2.9",
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The name of the value provided to C(loop_control.index_var).",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_inventory_sources": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "List of sources used as inventory",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_limit": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Contents of the C(--limit) CLI option for the current execution of Ansible",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_loop": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "A dictionary/map containing extended loop information when enabled through C(loop_control.extended)",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_loop_var": {
+        "doc": {
+            "version": "2.8",
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The name of the value provided to C(loop_control.loop_var).",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_parent_role_names": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "When the current role is being executed by means of an M(include_role) or M(import_role) action, this variable contains a list of all parent roles, with the most recent role (in other words, the role that included/imported this role) being the first item in the list.",
+                "When multiple inclusions occur, this list lists the I(last) role (in other words, the role that included this role) as the I(first) item in the list. It is also possible that a specific role exists more than once in this list.",
+                "",
+                "For example: When role B(A) includes role B(B), inside role B, C(ansible_parent_role_names) will equal to C(['A']). If role B(B) then includes role B(C), the list becomes C(['B', 'A']).",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_parent_role_paths": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "When the current role is being executed by means of an M(include_role) or M(import_role) action, this variable contains a list of all parent roles paths, with the most recent role (in other words, the role that included/imported this role) being the first item in the list.",
+                "Please refer to C(ansible_parent_role_names) for the order of items in this list.",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_play_batch": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "List of active hosts in the current play run limited by the serial, aka 'batch'. Failed/Unreachable hosts are not considered 'active'.",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_play_hosts": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "List of hosts in the current play run, not limited by the serial. Failed/Unreachable hosts are excluded from this list.",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_play_hosts_all": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "List of all the hosts that were targeted by the play",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_play_name": {
+        "doc": {
+            "version": "2.8",
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The name of the currently executed play. (`name` attribute of the play, not file name of the playbook.)",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_play_role_names": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The names of the roles currently imported into the current play. This list does B(not) contain the role names that are",
+                "implicitly included through dependencies.",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_playbook_python": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The path to the python interpreter being used by Ansible on the control node",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_role_name": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The fully qualified collection role name, in the format of C(namespace.collection.role_name)",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_role_names": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The names of the roles currently imported into the current play, or roles referenced as dependencies of the roles",
+                "imported into the current play.",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_run_tags": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Contents of the C(--tags) CLI option, which specifies which tags will be included for the current run. Note that if C(--tags) is not passed, this variable will default to C([\"all\"]).",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_search_path": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Current search path for action plugins and lookups, in other words, where we search for relative paths when you do C(template: src=myfile)",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_skip_tags": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Contents of the C(--skip-tags) CLI option, which specifies which tags will be skipped for the current run.",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_verbosity": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Current verbosity setting for Ansible",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_version": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Dictionary/map that contains information about the current running version of ansible, it has the following keys: full, major, minor, revision and string.",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "group_names": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "List of groups the current host is part of, it always reflects the C(inventory_hostname) and ignores delegation.",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "groups": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "A dictionary/map with all the groups in inventory and each group has the list of hosts that belong to it",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "hostvars": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "A dictionary/map with all the hosts in inventory and variables assigned to them",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "inventory_dir": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The directory of the inventory source in which the O(inventory_hostname) was first defined. This always reflects the C(inventory_hostname) and ignores delegation.",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "inventory_hostname": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The inventory name for the 'current' host being iterated over in the play. This is not affected by delegation, it always reflects the original host for the task",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "inventory_hostname_short": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The short version of O(inventory_hostname), is the first section after splitting it via C(.).",
+                "As an example, for the C(inventory_hostname) of C(www.example.com), C(www) would be the C(inventory_hostname_short)",
+                "This is affected by delegation, so it will reflect the 'short name' of the delegated host",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "inventory_file": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The file name of the inventory source in which the O(inventory_hostname) was first defined. Ignores delegation and always reflects the information for the C(inventory_hostname).",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "omit": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Special variable that allows you to 'omit' an option in a task, for example C(- user: name=bob home={{ bobs_home|default(omit) }})",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "play_hosts": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Deprecated, the same as ansible_play_batch",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "playbook_dir": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The path to the directory of the current playbook being executed.  NOTE: This might be different than directory of the playbook passed to the C(ansible-playbook) command line when a playbook contains a C(import_playbook) statement.",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "role_name": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The name of the role currently being executed.",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "role_names": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Deprecated, the same as ansible_play_role_names",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "role_path": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The path to the dir of the currently running role",
+                ""
+            ],
+            "category": "Magic variables"
+        }
+    },
+    "ansible_facts": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Contains any facts gathered or cached for the O(inventory_hostname)",
+                "Facts are normally gathered by the M(setup) module automatically in a play, but any module can return facts.",
+                ""
+            ],
+            "category": "Facts"
+        }
+    },
+    "ansible_local": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "Contains any 'local facts' gathered or cached for the O(inventory_hostname).",
+                "The keys available depend on the custom facts created.",
+                "See the M(setup) module and M(local_facts) for more details.",
+                ""
+            ],
+            "category": "Facts"
+        }
+    },
+    "ansible_become_user": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The user Ansible 'becomes' after using privilege escalation. This must be available to the 'login user'.",
+                ""
+            ],
+            "category": "Connection variables"
+        }
+    },
+    "ansible_connection": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The connection plugin actually used for the task on the target host.",
+                ""
+            ],
+            "category": "Connection variables"
+        }
+    },
+    "ansible_host": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The ip/name of the target host to use instead of O(inventory_hostname).",
+                ""
+            ],
+            "category": "Connection variables"
+        }
+    },
+    "ansible_python_interpreter": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The path to the Python executable Ansible should use on the target host.",
+                ""
+            ],
+            "category": "Connection variables"
+        }
+    },
+    "ansible_user": {
+        "doc": {
+            "author": [
+                "Various Ansible project contributors"
+            ],
+            "description": [
+                "The user Ansible 'logs in' as.",
+                ""
+            ],
+            "category": "Connection variables"
+        }
+    }
+}
