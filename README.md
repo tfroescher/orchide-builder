@@ -30,17 +30,22 @@ and is easier to create.
 
 Version V1 is based on older Ansible build scripts and uses a legacy format and less documentation within OrchidE.
 
-Version V1 is *deprecated*.
+Version V1 is *end of live*.
 
 ### Installation
 
 To use the latest definitions of Ansible Galaxy collections bundle with OrchidE:
 
 1. Download the latest definition package from [releases](https://github.com/tfroescher/orchide-builder/releases/) as 
-   a bundle in format [V2](https://github.com/tfroescher/orchide-builder/releases/20260330-v2) or [V1](https://github.com/tfroescher/orchide-builder/releases/latest)
-   or a specific Ansible version:
+   a bundle in format [V2](https://github.com/tfroescher/orchide-builder/releases/20260626-v2) or [V1](https://github.com/tfroescher/orchide-builder/releases/20260330)
+   (EOL version 20260330) or a specific Ansible version:
    - V2 bundles
-      * [13.5.0](https://github.com/tfroescher/orchide-builder/releases/13.5.0-v2),
+      * [14.1.0](https://github.com/tfroescher/orchide-builder/releases/14.1.0-v2),
+      [14.0.0](https://github.com/tfroescher/orchide-builder/releases/14.0.0-v2),
+      * [13.8.0](https://github.com/tfroescher/orchide-builder/releases/13.8.0-v2),
+      [13.7.0](https://github.com/tfroescher/orchide-builder/releases/13.7.0-v2),
+      [13.6.0](https://github.com/tfroescher/orchide-builder/releases/13.6.0-v2),
+      [13.5.0](https://github.com/tfroescher/orchide-builder/releases/13.5.0-v2),
       [13.4.0](https://github.com/tfroescher/orchide-builder/releases/13.4.0-v2),
       [13.3.0](https://github.com/tfroescher/orchide-builder/releases/13.3.0-v2),
       [13.2.0](https://github.com/tfroescher/orchide-builder/releases/13.2.0-v2),
